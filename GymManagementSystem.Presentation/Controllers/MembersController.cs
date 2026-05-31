@@ -188,7 +188,7 @@ public sealed class MembersController : Controller
 
     // POST BaseURL/Members/Edit/{id}
     [HttpPost]
-    public async Task<IActionResult> Edit(Guid id, MemberToBeEditedViewModel model, CancellationToken ct)
+    public async Task<IActionResult> Edit([FromRoute] Guid id, MemberToBeEditedViewModel model, CancellationToken ct)
     {
         if (!ModelState.IsValid)
             return View(model);
@@ -225,7 +225,7 @@ public sealed class MembersController : Controller
 
     // POST BaseURL/Members/Delete/{id}
     [HttpPost]
-    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
+    public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken ct)
     {
         var result = await _memberService.DeleteMemberAsync(id, ct);
 

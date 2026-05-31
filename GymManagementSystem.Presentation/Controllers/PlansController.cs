@@ -92,7 +92,7 @@ public sealed class PlansController : Controller
 
     // POST BaseURL/Plans/Edit/{id}
     [HttpPost]
-    public async Task<IActionResult> Edit(Guid id, PlanToBeEditedViewModel model, CancellationToken ct)
+    public async Task<IActionResult> Edit([FromRoute] Guid id, PlanToBeEditedViewModel model, CancellationToken ct)
     {
         if (!ModelState.IsValid)
             return View(model);
