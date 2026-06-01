@@ -25,12 +25,12 @@ public sealed class PlanService : IPlanService
     /* Methods */
     public async Task<IEnumerable<AllPlansDTO>> GetAllPlansAsync(CancellationToken ct = default)
     {
-        var plans = await _planRepo.GetAllAsync(ct);
+        var allPlans = await _planRepo.GetAllAsync(ct);
 
-        if (plans is null)
+        if (allPlans is null)
             return [];
 
-        var allPlansDTOs = plans.Select(p => new AllPlansDTO
+        var allPlansDTOs = allPlans.Select(p => new AllPlansDTO
         {
             Id = p.Id,
             Name = p.Name,
@@ -95,7 +95,9 @@ public sealed class PlanService : IPlanService
         planToBeUpdated!.DurationDays = planDTO.DurationDays;
         planToBeUpdated!.Description = planDTO.Description;
 
-        var numOfRowsAffected = await _planRepo.UpdateAsync(planToBeUpdated, ct);
+        _planRepo.Update(planToBeUpdated);
+
+        var numOfRowsAffected = await _planRepo.SaveChangesAsync(ct);
 
         if (numOfRowsAffected == 0)
             Result.Failure(PlanBusinessErrors.PlanNotEdited);
@@ -117,7 +119,9 @@ public sealed class PlanService : IPlanService
 
         planWithStatusToBeChanged!.IsActive = !planWithStatusToBeChanged.IsActive;
 
-        var numOfRowsAffected = await _planRepo.UpdateAsync(planWithStatusToBeChanged, ct);
+        _planRepo.Update(planWithStatusToBeChanged);
+
+        var numOfRowsAffected = await _planRepo.SaveChangesAsync(ct);
 
         if (numOfRowsAffected == 0)
             Result.Failure(PlanBusinessErrors.PlanStatusNotChanged);

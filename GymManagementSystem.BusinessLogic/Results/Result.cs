@@ -14,7 +14,7 @@ public class Result
     public Error? Error { get; }
 
     // Constructors
-    protected Result(bool isSuccessful, Error error)
+    protected Result(bool isSuccessful, Error? error)
     {
         // Check if passed parameters will create valid
         // state Result instance
@@ -37,7 +37,7 @@ public sealed class Result<T> : Result
     public T Value { get; }
 
     // Constructors
-    private Result(bool isSuccessful, Error error, T value) : base(isSuccessful, error)
+    private Result(bool isSuccessful, Error? error, T value) : base(isSuccessful, error)
     {
         this.Value = value;
     }
@@ -46,5 +46,5 @@ public sealed class Result<T> : Result
     public static Result<T> Success(T value)
         => new(true, null, value);
     public new static Result<T> Failure(Error error)
-        => new(false, error, default);
+        => new(false, error, default!);
 }

@@ -43,6 +43,9 @@ public sealed class MemberService : IMemberService
     {
         var allMembers = await _memberRepo.GetAllAsync(ct);
 
+        if (allMembers is null)
+            return [];
+
         return allMembers.Select(m => new AllMembersDTO
         {
             Id = m.Id,
@@ -134,7 +137,9 @@ public sealed class MemberService : IMemberService
             }
         };
 
-        var numOfRowsAffected = await _memberRepo.AddAsync(member,ct);
+        _memberRepo.Add(member);
+
+        var numOfRowsAffected = await _memberRepo.SaveChangesAsync(ct);
 
         if (numOfRowsAffected == 0)
             return Result.Failure(MemberBusinessErrors.MemberNotCreated);
@@ -182,7 +187,9 @@ public sealed class MemberService : IMemberService
         memberToBeEdited.Address.Street = memberDTO.Street;
         memberToBeEdited.Address.City = memberDTO.City;
 
-        var numOfRowsAffected = await _memberRepo.UpdateAsync(memberToBeEdited, ct);
+        _memberRepo.Update(memberToBeEdited);
+
+        var numOfRowsAffected = await _memberRepo.SaveChangesAsync(ct);
 
         if (numOfRowsAffected == 0)
             return Result.Failure(MemberBusinessErrors.MemberNotEdited);
@@ -202,7 +209,9 @@ public sealed class MemberService : IMemberService
         if (memberHasActiveBookings)
             return Result.Failure(MemberBusinessErrors.MemberWithActiveBookingsCannotBeDeleted);
 
-        var numOfRowsAffected = await _memberRepo.DeleteAsync(memberToBeDeleted, ct);
+        _memberRepo.SoftDelete(memberToBeDeleted);
+
+        var numOfRowsAffected = await _memberRepo.SaveChangesAsync(ct);
 
         if (numOfRowsAffected == 0)
             return Result.Failure(MemberBusinessErrors.MemberNotDeleted);

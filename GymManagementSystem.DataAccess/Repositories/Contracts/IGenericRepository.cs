@@ -8,11 +8,12 @@ namespace GymManagementSystem.DataAccess.Repositories.Contracts;
 
 public interface IGenericRepository<TEntity> where TEntity : BaseEntity, new()
 {
-    Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken ct , bool TrackingEnabled = false);
-    Task<TEntity?> GetByIdAsync(Guid id, CancellationToken ct, bool TrackingEnabled = false);
+    Task<IReadOnlyList<TEntity>?> GetAllAsync(CancellationToken ct , bool noTrackingEnabled = false, bool softDeletedItemsEnabled = false);
+    Task<TEntity?> GetByIdAsync(Guid id, CancellationToken ct, bool noTrackingEnabled = false, bool softDeletedItemsEnabled = false);
+    void Add(TEntity entity);
+    void Update(TEntity entity);
+    void SoftDelete(TEntity entity);
     Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity,bool>> predicate, CancellationToken ct, bool TrackingEnabled = false);
-    Task<int> AddAsync(TEntity entity, CancellationToken ct);
-    Task<int> UpdateAsync(TEntity entity, CancellationToken ct);
-    Task<int> DeleteAsync(TEntity entity, CancellationToken ct);
     Task<bool> AnyAsync(Expression<Func<TEntity,bool>> predicate, CancellationToken ct);
+    Task<int> SaveChangesAsync(CancellationToken ct);
 }

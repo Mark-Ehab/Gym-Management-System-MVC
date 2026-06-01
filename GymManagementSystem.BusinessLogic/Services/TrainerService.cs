@@ -89,7 +89,9 @@ public sealed class TrainerService : ITrainerService
             }
         };
 
-        var numOfRowsAffected = await _trainerRepo.AddAsync(trainerToBeAdded,ct);
+        _trainerRepo.Add(trainerToBeAdded);
+
+        var numOfRowsAffected = await _trainerRepo.SaveChangesAsync(ct);
 
         if (numOfRowsAffected == 0)
             return Result.Failure(TrainerBusinessErrors.TrainerNotCreated);
@@ -140,7 +142,9 @@ public sealed class TrainerService : ITrainerService
         trainerToBeEdited.Address.Street = trainerToBeEditedDTO.Street; 
         trainerToBeEdited.Address.City = trainerToBeEditedDTO.City;
 
-        var numOfRowsAffected = await _trainerRepo.UpdateAsync(trainerToBeEdited, ct);
+        _trainerRepo.Update(trainerToBeEdited);
+
+        var numOfRowsAffected = await _trainerRepo.SaveChangesAsync(ct);
 
         if (numOfRowsAffected == 0)
             return Result.Failure(TrainerBusinessErrors.TrainerNotEdited);
@@ -160,7 +164,9 @@ public sealed class TrainerService : ITrainerService
         if(trainerHasScheduledSessions)
             return Result.Failure(TrainerBusinessErrors.TrainerWithScheduledSessionsCannotBeDeleted);
 
-        var numOfRowsAffected = await _trainerRepo.DeleteAsync(trainerToBeDeleted, ct);
+        _trainerRepo.SoftDelete(trainerToBeDeleted);
+
+        var numOfRowsAffected = await _trainerRepo.SaveChangesAsync(ct);
 
         if (numOfRowsAffected == 0)
             return Result.Failure(TrainerBusinessErrors.TrainerNotDeleted);
