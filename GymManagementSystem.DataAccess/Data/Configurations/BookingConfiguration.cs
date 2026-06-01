@@ -15,7 +15,8 @@ public sealed class BookingConfiguration : IEntityTypeConfiguration<Booking>
         {
             b.MemberId,
             b.SessionId
-        }).IsUnique();
+        }).IsUnique()
+        .HasFilter("[IsDeleted] = 0");
 
         builder.Property(b => b.BookingDate)
             .HasDefaultValueSql("SYSDATETIME()")

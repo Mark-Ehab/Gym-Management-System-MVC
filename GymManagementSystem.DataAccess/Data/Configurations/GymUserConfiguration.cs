@@ -22,7 +22,8 @@ public class GymUserConfiguration<T> : IEntityTypeConfiguration<T> where T : Gym
             .IsRequired();
 
         builder.HasIndex(u => u.Email)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("[IsDeleted] = 0");
 
         builder.Property(u => u.Phone)
             .HasMaxLength(14)
@@ -30,7 +31,8 @@ public class GymUserConfiguration<T> : IEntityTypeConfiguration<T> where T : Gym
             .IsRequired();
 
         builder.HasIndex(u => u.Phone)
-        .IsUnique();
+        .IsUnique()
+        .HasFilter("[IsDeleted] = 0");
 
         builder.Property(u => u.DateOfBirth)
             .HasColumnOrder(5)
