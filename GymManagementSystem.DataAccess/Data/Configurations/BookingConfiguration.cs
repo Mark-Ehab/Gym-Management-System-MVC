@@ -11,6 +11,12 @@ public sealed class BookingConfiguration : IEntityTypeConfiguration<Booking>
 {
     public void Configure(EntityTypeBuilder<Booking> builder)
     {
+        builder.HasIndex(b => new
+        {
+            b.MemberId,
+            b.SessionId
+        }).IsUnique();
+
         builder.Property(b => b.BookingDate)
             .HasDefaultValueSql("SYSDATETIME()")
             .IsRequired();
