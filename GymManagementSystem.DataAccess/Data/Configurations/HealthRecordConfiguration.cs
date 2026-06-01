@@ -35,6 +35,10 @@ public sealed class HealthRecordConfiguration : IEntityTypeConfiguration<HealthR
             .HasColumnOrder(6)
             .IsRequired();
 
+        builder.HasIndex(hr => hr.MemberId)
+            .IsUnique()
+            .HasFilter("[IsDeleted] = 0");
+
         builder.HasOne(hr => hr.Member)
             .WithOne(m => m.HealthRecord)
             .HasForeignKey<HealthRecord>(hr => hr.MemberId)
