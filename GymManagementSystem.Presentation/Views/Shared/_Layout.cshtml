@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var controllerName = ViewContext.RouteData.Values["Controller"]?.ToString() ?? "";
+    string setActive(string navLinkName)
+        => string.Equals(controllerName, navLinkName, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -20,7 +25,7 @@
         <nav class="navbar navbar-expand-lg bg-white my-3">
             <div class="container">
                 <a class="navbar-brand" asp-controller="home" asp-action="index">
-                    <img src="~/images/logo.jpg" alt="Power Fitness Icon" />
+                    <img src="~/images/logo.jpg" alt="Power Fitness Icon" asp-append-version ="true"/>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -32,28 +37,25 @@
                     <ul class="navbar-nav m-auto mb-2 mb-lg-0 mt-3 mt-lg-0">
                         <li class="nav-item">
                         <li class="nav-item">
-                            <a class="nav-link active px-3 py-2 mx-2 fw-bolder fs-5" aria-current="page"
-                                asp-controller="Home" asp-action="Index">Home</a>
+                                <a class="nav-link @setActive("Home") px-3 py-2 mx-2 fw-bolder fs-5" aria-current="@(setActive("Home") == "active"? "page" : null)" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link  px-3 py-2 mx-2 fw-bolder fs-5" aria-current="page" asp-controller="Members" asp-action="Index">Members</a>
+                            <a class="nav-link @setActive("Members")  px-3 py-2 mx-2 fw-bolder fs-5" aria-current="@(setActive("Members") == "active"? "page" : null)" asp-controller="Members" asp-action="Index">Members</a>
                         </li>
                         <li class="nav-item">
-                                <a class="nav-link  px-3 py-2 mx-2 fw-bolder fs-5" aria-current="page" asp-controller="Trainers" asp-action="Index">Trainers</a>
+                                <a class="nav-link @setActive("Trainers")  px-3 py-2 mx-2 fw-bolder fs-5" aria-current="@(setActive("Trainers") == "active"? "page" : null)" asp-controller="Trainers" asp-action="Index">Trainers</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link  px-3 py-2 mx-2 fw-bolder fs-5" aria-current="page" href="#">Sessions</a>
+                                <a class="nav-link @setActive("Sessions")  px-3 py-2 mx-2 fw-bolder fs-5" aria-current="@(setActive("Sessions") == "active"? "page" : null)" asp-controller="Sessions" asp-action="Index">Sessions</a>
                         </li>
                         <li class="nav-item">
-                                <a class="nav-link px-3 py-2 mx-2 fw-bolder fs-5" aria-current="page" asp-controller="Plans" asp-action="Index">Plans</a>
+                                <a class="nav-link @setActive("Plans") px-3 py-2 mx-2 fw-bolder fs-5" aria-current="@(setActive("Plans") == "active"? "page" : null)" asp-controller="Plans" asp-action="Index">Plans</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link px-3 py-2 mx-2 fw-bolder fs-5" aria-current="page"
-                                href="#">Memberships</a>
+                                <a class="nav-link @setActive("Memberships") px-3 py-2 mx-2 fw-bolder fs-5" aria-current="@(setActive("Memberships") == "active"? "page" : null)" asp-controller="Memberships" asp-action="Index">Memberships</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link px-3 py-2 mx-2 fw-bolder fs-5" aria-current="page" href="#">Sessions
-                                Schedule</a>
+                                <a class="nav-link @setActive("Sessions Schedule") px-3 py-2 mx-2 fw-bolder fs-5" aria-current="@(setActive("Sessions Schedule") == "active"? "page" : null)" asp-controller="SessionsSchedule" asp-action="Index">Sessions Schedule</a>
                         </li>
                         <li class="nav-item">
                             <form href="\Account\Logout" method="post" class="d-inline">
