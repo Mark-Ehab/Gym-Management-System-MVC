@@ -71,6 +71,7 @@ public sealed class TrainersController : Controller
 
     // POST BaseURL/Trainers/Create
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(TrainerCreateViewModel model ,CancellationToken ct)
     {
         if(!ModelState.IsValid)
@@ -131,6 +132,7 @@ public sealed class TrainersController : Controller
 
     // POST BaseURL/Trainers/Edit/{id}
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit([FromRoute] Guid id ,TrainerToBeEditedViewModel model ,CancellationToken ct)
     {
         if(!ModelState.IsValid)
@@ -168,6 +170,7 @@ public sealed class TrainersController : Controller
 
     // POST BaseURL/Trainers/Delete/{id}
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken ct)
     {
         var result = await _trainerService.DeleteTrainerAsync(id, ct);

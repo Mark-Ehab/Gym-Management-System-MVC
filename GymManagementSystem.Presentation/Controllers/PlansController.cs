@@ -92,6 +92,7 @@ public sealed class PlansController : Controller
 
     // POST BaseURL/Plans/Edit/{id}
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit([FromRoute] Guid id, PlanToBeEditedViewModel model, CancellationToken ct)
     {
         if (!ModelState.IsValid)
@@ -121,6 +122,7 @@ public sealed class PlansController : Controller
 
     // POST BaseURL/Plans/Activate/{id}
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Activate(Guid id)
     {
         var result = await _planService.ChangePlanStatusAsync(id);

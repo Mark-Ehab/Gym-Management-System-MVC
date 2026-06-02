@@ -111,6 +111,7 @@ public sealed class MembersController : Controller
 
     // POST BaseURL/Members/Create
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(MemberCreateViewModel model , CancellationToken ct)
     {
         if(!ModelState.IsValid)
@@ -188,6 +189,7 @@ public sealed class MembersController : Controller
 
     // POST BaseURL/Members/Edit/{id}
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit([FromRoute] Guid id, MemberToBeEditedViewModel model, CancellationToken ct)
     {
         if (!ModelState.IsValid)
@@ -225,6 +227,7 @@ public sealed class MembersController : Controller
 
     // POST BaseURL/Members/Delete/{id}
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken ct)
     {
         var result = await _memberService.DeleteMemberAsync(id, ct);
