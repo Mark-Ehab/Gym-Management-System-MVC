@@ -1,6 +1,8 @@
 using GymManagementSystem.BusinessLogic.Contracts.Services;
+using GymManagementSystem.BusinessLogic.Extensions.ServiceCollectionExtensions;
 using GymManagementSystem.BusinessLogic.Services;
 using GymManagementSystem.DataAccess.Data.Contexts;
+using GymManagementSystem.DataAccess.Extensions.ServiceCollectionExtensions;
 using GymManagementSystem.DataAccess.Interceptors;
 using GymManagementSystem.DataAccess.Repositories.Classes;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
@@ -9,19 +11,14 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Register controllers with views to the DI container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<IPlanService,PlanService>();
-builder.Services.AddScoped<IMemberService,MemberService>();
-builder.Services.AddScoped<ITrainerService,TrainerService>();
-builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
 
-// Register GymDbContext to DI Container
-builder.Services.AddDbContext<GymDbContext>(options =>
+// Register Business Logic layer services to the DI container.
+builder.Services.AddBusiness();
 
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-    .AddInterceptors(new SoftDeleteInterceptor(),new AuditColumnsInterceptor())
-);
+// Register Data Access layer services to the DI container.
+builder.Services.AddDataAccess(builder.Configuration);
 
 var app = builder.Build();
 
