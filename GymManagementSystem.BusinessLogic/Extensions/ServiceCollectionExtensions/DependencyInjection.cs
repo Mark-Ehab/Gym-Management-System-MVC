@@ -10,7 +10,7 @@ namespace GymManagementSystem.BusinessLogic.Extensions.ServiceCollectionExtensio
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddBusiness(this IServiceCollection services)
+    public static IServiceCollection AddBusinessLogic(this IServiceCollection services)
     {
         // Register business logic services to the DI container.
         services.AddScoped<IPlanService, PlanService>();

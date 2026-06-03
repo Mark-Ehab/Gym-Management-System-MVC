@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Register Business Logic layer services to the DI container.
-builder.Services.AddBusiness();
+builder.Services.AddBusinessLogic();
 
 // Register Data Access layer services to the DI container.
 builder.Services.AddDataAccess(builder.Configuration);
