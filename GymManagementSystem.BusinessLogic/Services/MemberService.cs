@@ -204,10 +204,10 @@ public sealed class MemberService : IMemberService
         if(memberToBeDeleted is null)
             return Result.Failure(MemberBusinessErrors.MemberToBeDeletedNotFound);
 
-        var memberHasActiveBookings = await _bookingRepo.AnyAsync(b => b.MemberId == id,ct);
+        var memberHasActiveCurrentOrFutureBookings = await _bookingRepo.AnyAsync(b => b.MemberId == id && b.Session.StartDate >= DateTime.UtcNow,ct);
 
-        if (memberHasActiveBookings)
-            return Result.Failure(MemberBusinessErrors.MemberWithActiveBookingsCannotBeDeleted);
+        if (memberHasActiveCurrentOrFutureBookings)
+            return Result.Failure(MemberBusinessErrors.MemberWithActiveCurrentOrFutureBookingsCannotBeDeleted);
 
         _memberRepo.SoftDelete(memberToBeDeleted);
 
