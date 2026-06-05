@@ -7,12 +7,13 @@ using GymManagementSystem.DataAccess.Interceptors;
 using GymManagementSystem.DataAccess.Repositories.Classes;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
 using GymManagementSystem.DataAccess.Seeders;
+using GymManagementSystem.Presentation.Extensions.ServiceCollectionExtensions;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register controllers with views to the DI container.
-builder.Services.AddControllersWithViews();
+// Register Presentation layer services to the DI container.
+builder.Services.AddPresentation();
 
 // Register Business Logic layer services to the DI container.
 builder.Services.AddBusinessLogic();
