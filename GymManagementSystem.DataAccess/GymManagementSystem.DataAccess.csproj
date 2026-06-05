@@ -18,4 +18,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Specifictions\Classes\" />
+    <Folder Include="Specifictions\Contract\" />
+  </ItemGroup>
+
 </Project>

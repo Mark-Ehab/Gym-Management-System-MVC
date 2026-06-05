@@ -28,10 +28,10 @@ public sealed class GenericRepository<TEntity> : IGenericRepository<TEntity> whe
         var query = _entityDbSet.AsQueryable();
 
         if (noTrackingEnabled)
-            query = _entityDbSet.AsNoTracking();
+            query = query.AsNoTracking();
 
         if (softDeletedItemsEnabled)
-            query = _entityDbSet.IgnoreQueryFilters();
+            query = query.IgnoreQueryFilters();
 
         return await query.ToListAsync(ct);
     }
@@ -41,10 +41,10 @@ public sealed class GenericRepository<TEntity> : IGenericRepository<TEntity> whe
         var query = _entityDbSet.AsQueryable();
 
         if (noTrackingEnabled)
-            query = _entityDbSet.AsNoTracking();
+            query = query.AsNoTracking();
 
         if (softDeletedItemsEnabled)
-            query = _entityDbSet.IgnoreQueryFilters();
+            query = query.IgnoreQueryFilters();
 
         return await query.FirstOrDefaultAsync(e => e.Id == id, ct);
     }    

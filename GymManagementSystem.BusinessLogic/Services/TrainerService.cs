@@ -4,6 +4,7 @@ using GymManagementSystem.BusinessLogic.Helpers.BusinessErrors;
 using GymManagementSystem.BusinessLogic.Results;
 using GymManagementSystem.DataAccess.Models;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
+using GymManagementSystem.DataAccess.UoW.Contract;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,20 +14,20 @@ namespace GymManagementSystem.BusinessLogic.Services;
 public sealed class TrainerService : ITrainerService
 {
     /* Fields */
-    private readonly IGenericRepository<Trainer> _trainerRepo;
-    private readonly IGenericRepository<Session> _sessionRepo;
+    private readonly IUnitOfWork _unitOfWork;
 
     /* Constructor */
-    public TrainerService(IGenericRepository<Trainer> trainerRepo, IGenericRepository<Session> sessionRepo)
+    public TrainerService(IUnitOfWork unitOfWork)
     {
-        _trainerRepo = trainerRepo;
-        _sessionRepo = sessionRepo;
+        _unitOfWork = unitOfWork;
     }
 
     /* Methods */
     public async Task<IEnumerable<AllTrainersDTO>> GetAllTrainersAsync(CancellationToken ct)
     {
-        var allTrainers = await _trainerRepo.GetAllAsync(ct);
+        var trainerRepo = _unitOfWork.GetGenericRepository<Trainer>();
+
+        var allTrainers = await trainerRepo.GetAllAsync(ct);
 
         if (allTrainers is null)
             return [];
@@ -43,7 +44,9 @@ public sealed class TrainerService : ITrainerService
 
     public async Task<Result<TrainerDetailsDTO>> GetTrainerDetailsAsync(Guid id, CancellationToken ct)
     {
-        var trainer = await _trainerRepo.GetByIdAsync(id, ct);
+        var trainerRepo = _unitOfWork.GetGenericRepository<Trainer>();
+
+        var trainer = await trainerRepo.GetByIdAsync(id, ct);
 
         if (trainer is null)
             return Result<TrainerDetailsDTO>.Failure(TrainerBusinessErrors.TrainerDetailsNotFound);
@@ -65,12 +68,14 @@ public sealed class TrainerService : ITrainerService
 
     public async Task<Result> AddTrainerAsync(TrainerCreateDTO trainerDTO, CancellationToken ct)
     {
+        var trainerRepo = _unitOfWork.GetGenericRepository<Trainer>();
+
         /* Check if entered email already exists on the system */
-        if (await _trainerRepo.AnyAsync(t => t.Email == trainerDTO.Email,ct))
+        if (await trainerRepo.AnyAsync(t => t.Email == trainerDTO.Email,ct))
             return Result.Failure(TrainerBusinessErrors.TrainerEmailAlreadyExists);
 
         /* Check if entered phone already exists on the system */
-        if (await _trainerRepo.AnyAsync(t => t.Phone == trainerDTO.Phone,ct))
+        if (await trainerRepo.AnyAsync(t => t.Phone == trainerDTO.Phone,ct))
             return Result.Failure(TrainerBusinessErrors.TrainerPhoneNumberAlreadyExists);
 
         var trainerToBeAdded = new Trainer()
@@ -89,9 +94,9 @@ public sealed class TrainerService : ITrainerService
             }
         };
 
-        _trainerRepo.Add(trainerToBeAdded);
+        trainerRepo.Add(trainerToBeAdded);
 
-        var numOfRowsAffected = await _trainerRepo.SaveChangesAsync(ct);
+        var numOfRowsAffected = await _unitOfWork.SaveChangesAsync(ct);
 
         if (numOfRowsAffected == 0)
             return Result.Failure(TrainerBusinessErrors.TrainerNotCreated);
@@ -101,7 +106,9 @@ public sealed class TrainerService : ITrainerService
 
     public async Task<Result<TrainerToBeEditedDTO>> GetTrainerToBeEditedAsync(Guid id, CancellationToken ct)
     {
-        var trainerToBeEdited = await _trainerRepo.GetByIdAsync(id, ct);
+        var trainerRepo = _unitOfWork.GetGenericRepository<Trainer>();
+
+        var trainerToBeEdited = await trainerRepo.GetByIdAsync(id, ct);
 
         if (trainerToBeEdited is null)
             return Result<TrainerToBeEditedDTO>.Failure(TrainerBusinessErrors.TrainerToBeEditedNotFound);
@@ -122,15 +129,17 @@ public sealed class TrainerService : ITrainerService
 
     public async Task<Result> EditTrainerAsync(Guid id, TrainerToBeEditedDTO trainerToBeEditedDTO, CancellationToken ct)
     {
+        var trainerRepo = _unitOfWork.GetGenericRepository<Trainer>();
+
         /* Check if email already exists on the system */
-        if (await _trainerRepo.AnyAsync(t => t.Email == trainerToBeEditedDTO.Email && t.Id != id, ct))
+        if (await trainerRepo.AnyAsync(t => t.Email == trainerToBeEditedDTO.Email && t.Id != id, ct))
             return Result.Failure(TrainerBusinessErrors.TrainerEmailAlreadyExists);
 
         /* Check if phone already exists on the system */
-        if (await _trainerRepo.AnyAsync(t => t.Phone == trainerToBeEditedDTO.Phone && t.Id != id, ct))
+        if (await trainerRepo.AnyAsync(t => t.Phone == trainerToBeEditedDTO.Phone && t.Id != id, ct))
             return Result.Failure(TrainerBusinessErrors.TrainerPhoneNumberAlreadyExists);
 
-        var trainerToBeEdited = await _trainerRepo.GetByIdAsync(id,ct);
+        var trainerToBeEdited = await trainerRepo.GetByIdAsync(id,ct);
 
         if(trainerToBeEdited is null)
             return Result.Failure(TrainerBusinessErrors.TrainerToBeEditedNotFound);
@@ -142,9 +151,9 @@ public sealed class TrainerService : ITrainerService
         trainerToBeEdited.Address.Street = trainerToBeEditedDTO.Street; 
         trainerToBeEdited.Address.City = trainerToBeEditedDTO.City;
 
-        _trainerRepo.Update(trainerToBeEdited);
+        trainerRepo.Update(trainerToBeEdited);
 
-        var numOfRowsAffected = await _trainerRepo.SaveChangesAsync(ct);
+        var numOfRowsAffected = await _unitOfWork.SaveChangesAsync(ct);
 
         if (numOfRowsAffected == 0)
             return Result.Failure(TrainerBusinessErrors.TrainerNotEdited);
@@ -154,19 +163,23 @@ public sealed class TrainerService : ITrainerService
 
     public async Task<Result> DeleteTrainerAsync(Guid id, CancellationToken ct)
     {
-        var trainerToBeDeleted = await _trainerRepo.GetByIdAsync(id, ct);
+        var trainerRepo = _unitOfWork.GetGenericRepository<Trainer>();
+
+        var trainerToBeDeleted = await trainerRepo.GetByIdAsync(id, ct);
 
         if (trainerToBeDeleted is null)
             return Result.Failure(TrainerBusinessErrors.TrainerToBeDeletedNotFound);
 
-        var trainerHasScheduledSessions = await _sessionRepo.AnyAsync(s => s.TrainerId == id, ct);
+        var sessionRepo = _unitOfWork.GetGenericRepository<Session>();
+
+        var trainerHasScheduledSessions = await sessionRepo.AnyAsync(s => s.TrainerId == id, ct);
 
         if(trainerHasScheduledSessions)
             return Result.Failure(TrainerBusinessErrors.TrainerWithScheduledSessionsCannotBeDeleted);
 
-        _trainerRepo.SoftDelete(trainerToBeDeleted);
+        trainerRepo.SoftDelete(trainerToBeDeleted);
 
-        var numOfRowsAffected = await _trainerRepo.SaveChangesAsync(ct);
+        var numOfRowsAffected = await _unitOfWork.SaveChangesAsync(ct);
 
         if (numOfRowsAffected == 0)
             return Result.Failure(TrainerBusinessErrors.TrainerNotDeleted);

@@ -4,6 +4,7 @@ using GymManagementSystem.BusinessLogic.Helpers.BusinessErrors;
 using GymManagementSystem.BusinessLogic.Results;
 using GymManagementSystem.DataAccess.Models;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
+using GymManagementSystem.DataAccess.UoW.Contract;
 using System.Numerics;
 
 namespace GymManagementSystem.BusinessLogic.Services;
@@ -11,21 +12,20 @@ namespace GymManagementSystem.BusinessLogic.Services;
 public sealed class PlanService : IPlanService
 {
     /* Fields */
-    private readonly IGenericRepository<Plan> _planRepo;
-    private readonly IGenericRepository<Membership> _membershipRepo;
+    private readonly IUnitOfWork _unitOfWork;
 
     /* Constructor */
-    public PlanService(IGenericRepository<Plan> planRepo,
-        IGenericRepository<Membership> membershipRepo)
+    public PlanService(IUnitOfWork unitOfWork)
     {
-        _planRepo = planRepo;
-        _membershipRepo = membershipRepo;
+        _unitOfWork = unitOfWork;
     }
 
     /* Methods */
     public async Task<IEnumerable<AllPlansDTO>> GetAllPlansAsync(CancellationToken ct = default)
     {
-        var allPlans = await _planRepo.GetAllAsync(ct);
+        var planRepo = _unitOfWork.GetGenericRepository<Plan>();
+
+        var allPlans = await planRepo.GetAllAsync(ct);
 
         if (allPlans is null)
             return [];
@@ -44,7 +44,9 @@ public sealed class PlanService : IPlanService
     }
     public async Task<Result<PlanDetailsDTO>> GetPlanDetailsAsync(Guid id, CancellationToken ct = default)
     {
-        var plan = await _planRepo.GetByIdAsync(id, ct);
+        var planRepo = _unitOfWork.GetGenericRepository<Plan>();
+
+        var plan = await planRepo.GetByIdAsync(id, ct);
 
         if (plan is null)
             return Result<PlanDetailsDTO>.Failure(PlanBusinessErrors.PlanDetailsNotFound);
@@ -60,12 +62,16 @@ public sealed class PlanService : IPlanService
 
     public async Task<Result<PlanToBeEditedDTO>> GetPlanToBeEditedAsync(Guid id, CancellationToken ct = default)
     {
-        var planToBeEdited = await _planRepo.GetByIdAsync(id, ct);
+        var planRepo = _unitOfWork.GetGenericRepository<Plan>();
+
+        var planToBeEdited = await planRepo.GetByIdAsync(id, ct);
 
         if (planToBeEdited is null)
             return Result<PlanToBeEditedDTO>.Failure(PlanBusinessErrors.PlanToBeEditedNotFound);
 
-        var planHasActiveMemberships = await _membershipRepo.AnyAsync(ms => ms.PlanId == id, ct);
+        var membershipRepo = _unitOfWork.GetGenericRepository<Membership>();
+
+        var planHasActiveMemberships = await membershipRepo.AnyAsync(ms => ms.PlanId == id, ct);
 
         if (planHasActiveMemberships)
             return Result<PlanToBeEditedDTO>.Failure(PlanBusinessErrors.PlanToBeEditedHasActiveMemberships);
@@ -81,12 +87,16 @@ public sealed class PlanService : IPlanService
 
     public async Task<Result> UpdatePlanToBeEditedAsync(Guid id, PlanToBeEditedDTO planDTO, CancellationToken ct = default)
     {
-        var planToBeUpdated = await _planRepo.GetByIdAsync(id,ct);
+        var planRepo = _unitOfWork.GetGenericRepository<Plan>();
+
+        var planToBeUpdated = await planRepo.GetByIdAsync(id,ct);
 
         if (planToBeUpdated is null)
             return Result.Failure(PlanBusinessErrors.PlanToBeEditedNotFound);
 
-        var planHasActiveMemberships = await _membershipRepo.AnyAsync(ms => ms.PlanId == id,ct);
+        var membershipRepo = _unitOfWork.GetGenericRepository<Membership>();
+
+        var planHasActiveMemberships = await membershipRepo.AnyAsync(ms => ms.PlanId == id,ct);
 
         if (planHasActiveMemberships)
             return Result.Failure(PlanBusinessErrors.PlanToBeEditedHasActiveMemberships);
@@ -95,9 +105,9 @@ public sealed class PlanService : IPlanService
         planToBeUpdated!.DurationDays = planDTO.DurationDays;
         planToBeUpdated!.Description = planDTO.Description;
 
-        _planRepo.Update(planToBeUpdated);
+        planRepo.Update(planToBeUpdated);
 
-        var numOfRowsAffected = await _planRepo.SaveChangesAsync(ct);
+        var numOfRowsAffected = await _unitOfWork.SaveChangesAsync(ct);
 
         if (numOfRowsAffected == 0)
             Result.Failure(PlanBusinessErrors.PlanNotEdited);
@@ -107,21 +117,25 @@ public sealed class PlanService : IPlanService
 
     public async Task<Result> ChangePlanStatusAsync(Guid id, CancellationToken ct = default)
     {
-        var planWithStatusToBeChanged = await _planRepo.GetByIdAsync(id, ct);
+        var planRepo = _unitOfWork.GetGenericRepository<Plan>();
+
+        var planWithStatusToBeChanged = await planRepo.GetByIdAsync(id, ct);
 
         if (planWithStatusToBeChanged is null)
             return Result.Failure(PlanBusinessErrors.PlanWithStatusToBeChangedNotFound);
 
-        var planHasActiveMemberships = await _membershipRepo.AnyAsync(ms => ms.PlanId == id, ct);
+        var membershipRepo = _unitOfWork.GetGenericRepository<Membership>();
+
+        var planHasActiveMemberships = await membershipRepo.AnyAsync(ms => ms.PlanId == id, ct);
 
         if (planHasActiveMemberships && planWithStatusToBeChanged.IsActive == true)
             return Result.Failure(PlanBusinessErrors.PlanWithActiveMembershipsCannotBeDeactivated);
 
         planWithStatusToBeChanged!.IsActive = !planWithStatusToBeChanged.IsActive;
 
-        _planRepo.Update(planWithStatusToBeChanged);
+        planRepo.Update(planWithStatusToBeChanged);
 
-        var numOfRowsAffected = await _planRepo.SaveChangesAsync(ct);
+        var numOfRowsAffected = await _unitOfWork.SaveChangesAsync(ct);
 
         if (numOfRowsAffected == 0)
             Result.Failure(PlanBusinessErrors.PlanStatusNotChanged);

@@ -2,6 +2,8 @@
 using GymManagementSystem.DataAccess.Interceptors;
 using GymManagementSystem.DataAccess.Repositories.Classes;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
+using GymManagementSystem.DataAccess.UoW.Class;
+using GymManagementSystem.DataAccess.UoW.Contract;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +17,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddDataAccess(this IServiceCollection services, IConfiguration configuration)
     {
+        // Register Unit of Work to DI Container
+        services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
+
         // Register any instance from GenericRepository<> and implementing IGenericRepository<> to DI Container
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
