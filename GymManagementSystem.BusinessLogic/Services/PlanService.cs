@@ -1,4 +1,5 @@
-﻿using GymManagementSystem.BusinessLogic.BusinessSpecifictions.PlanSpecifications;
+﻿using AutoMapper;
+using GymManagementSystem.BusinessLogic.BusinessSpecifictions.PlanSpecifications;
 using GymManagementSystem.BusinessLogic.Contracts.Services;
 using GymManagementSystem.BusinessLogic.DTOs.PlanDTOs;
 using GymManagementSystem.BusinessLogic.Helpers.BusinessErrors;
@@ -14,11 +15,13 @@ public sealed class PlanService : IPlanService
 {
     /* Fields */
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
     /* Constructor */
-    public PlanService(IUnitOfWork unitOfWork)
+    public PlanService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
 
     /* Methods */
@@ -31,17 +34,7 @@ public sealed class PlanService : IPlanService
         if (allPlans is null)
             return [];
 
-        var allPlansDTOs = allPlans.Select(p => new AllPlansDTO
-        {
-            Id = p.Id,
-            Name = p.Name,
-            Price = p.Price,
-            Status = p.IsActive,
-            DurationDays = p.DurationDays,
-            Description = p.Description
-        });
-
-        return allPlansDTOs;
+        return _mapper.Map<IEnumerable<AllPlansDTO>>(allPlans);
     }
     public async Task<Result<PlanDetailsDTO>> GetPlanDetailsAsync(Guid id, CancellationToken ct = default)
     {
@@ -52,14 +45,7 @@ public sealed class PlanService : IPlanService
         if (plan is null)
             return Result<PlanDetailsDTO>.Failure(PlanBusinessErrors.PlanDetailsNotFound);
 
-        return Result<PlanDetailsDTO>.Success(new()
-        {
-            Name = plan.Name,
-            Status = plan.IsActive,
-            Price = plan.Price,
-            DurationDays = plan.DurationDays,
-            Description = plan.Description
-        });
+        return Result<PlanDetailsDTO>.Success(_mapper.Map<PlanDetailsDTO>(plan));
     }
 
     public async Task<Result<PlanToBeEditedDTO>> GetPlanToBeEditedAsync(Guid id, CancellationToken ct = default)
@@ -79,13 +65,7 @@ public sealed class PlanService : IPlanService
         if (planHasActiveMemberships)
             return Result<PlanToBeEditedDTO>.Failure(PlanBusinessErrors.PlanToBeEditedHasActiveMemberships);
 
-        return Result<PlanToBeEditedDTO>.Success(new()
-        {
-            Name = planToBeEdited.Name,
-            Price = planToBeEdited.Price,
-            DurationDays = planToBeEdited.DurationDays,
-            Description = planToBeEdited.Description
-        });
+        return Result<PlanToBeEditedDTO>.Success(_mapper.Map<PlanToBeEditedDTO>(planToBeEdited));
     }
 
     public async Task<Result> UpdatePlanToBeEditedAsync(Guid id, PlanToBeEditedDTO planDTO, CancellationToken ct = default)
@@ -105,9 +85,7 @@ public sealed class PlanService : IPlanService
         if (planHasActiveMemberships)
             return Result.Failure(PlanBusinessErrors.PlanToBeEditedHasActiveMemberships);
 
-        planToBeUpdated!.Price = planDTO.Price;
-        planToBeUpdated!.DurationDays = planDTO.DurationDays;
-        planToBeUpdated!.Description = planDTO.Description;
+        _mapper.Map(planDTO,planToBeUpdated);
 
         planRepo.Update(planToBeUpdated);
 

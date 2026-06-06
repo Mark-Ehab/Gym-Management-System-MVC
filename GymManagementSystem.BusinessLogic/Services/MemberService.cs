@@ -1,4 +1,5 @@
-﻿using GymManagementSystem.BusinessLogic.BusinessSpecifictions;
+﻿using AutoMapper;
+using GymManagementSystem.BusinessLogic.BusinessSpecifictions;
 using GymManagementSystem.BusinessLogic.BusinessSpecifictions.MemberSpecifications;
 using GymManagementSystem.BusinessLogic.Contracts.Services;
 using GymManagementSystem.BusinessLogic.DTOs.HealthRecordDTOs;
@@ -21,11 +22,13 @@ public sealed class MemberService : IMemberService
 {
     /* Fields */
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
     /* Constructor */
-    public MemberService(IUnitOfWork unitOfWork)
+    public MemberService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
 
     /* Methods */
@@ -38,15 +41,7 @@ public sealed class MemberService : IMemberService
         if (allMembers is null)
             return [];
 
-        return allMembers.Select(m => new AllMembersDTO
-        {
-            Id = m.Id,
-            Photo = m.Photo,
-            Name = m.Name,
-            Email = m.Email,
-            Phone = m.Phone,
-            Gender = m.Gender
-        });
+        return _mapper.Map<IEnumerable<AllMembersDTO>>(allMembers);
     }
 
     public async Task<Result<MemberDetailsDTO>> GetMemberDetailsAsync(Guid id, CancellationToken ct = default)
@@ -59,33 +54,7 @@ public sealed class MemberService : IMemberService
         if(member is null)
             return Result<MemberDetailsDTO>.Failure(MemberBusinessErrors.MemberDetailsNotFound);
 
-        var memberDetailsDTO = new MemberDetailsDTO()
-        {
-            Photo = member.Photo,
-            Name = member.Name,
-            Email = member.Email,
-            Phone = member.Phone,
-            DateOfBirth = member.DateOfBirth,
-            Address = string.Join(" - ", member.Address.BuildingNumber, member.Address.Street, member.Address.City),
-            Gender = member.Gender,
-            MembershipStartDate = member.Memberships.FirstOrDefault()?.StartDate,
-            MembershipEndDate = member.Memberships.FirstOrDefault()?.EndDate,
-            PlanName = member.Memberships.FirstOrDefault()?.Plan.Name
-        };
-
-        //var membershipRepo = _unitOfWork.GetGenericRepository<Membership>();
-
-        //var latestMemberActiveMembership = await membershipRepo.FirstOrDefaultAsync(ms => ms.MemberId == id,ct);
-
-        //if (latestMemberActiveMembership is not null)
-        //{
-        //    var planRepo = _unitOfWork.GetGenericRepository<Plan>();
-        //    var latestPlan = await planRepo.GetByIdAsync(latestMemberActiveMembership.PlanId, ct);
-        //    var latestPlanName = latestPlan!.Name;
-        //    memberDetailsDTO.MembershipStartDate = latestMemberActiveMembership.StartDate;
-        //    memberDetailsDTO.MembershipEndDate = latestMemberActiveMembership.EndDate;
-        //    memberDetailsDTO.PlanName = latestPlanName;
-        //}
+        var memberDetailsDTO = _mapper.Map<MemberDetailsDTO>(member);
 
         return Result<MemberDetailsDTO>.Success(memberDetailsDTO);
     }
@@ -99,21 +68,15 @@ public sealed class MemberService : IMemberService
         if(healthRecord is null)
             return Result<HealthRecordDTO>.Failure(MemberBusinessErrors.MemberHealthRecordDetailsNotFound);
 
-        return Result<HealthRecordDTO>.Success(new()
-        {
-            Height = healthRecord.Height,
-            Weight = healthRecord.Weight,
-            BloodType = healthRecord.BloodType,
-            Note = healthRecord?.Note
-        });
+        return Result<HealthRecordDTO>.Success(_mapper.Map<HealthRecordDTO>(healthRecord));
     }
 
-    public async Task<Result> AddMemberAsync(MemberCreateDTO memberDTO, CancellationToken ct = default)
+    public async Task<Result> AddMemberAsync(MemberCreateDTO memberToBeCreatedDTO, CancellationToken ct = default)
     {
         var memberRepo = _unitOfWork.GetGenericRepository<Member>();
 
-        var newMemberWithUniqueEmailSpecification = new NewMemberWithUniqueEmailSpecification(memberDTO.Email);
-        var newMemberWithUniquePhoneNumberSpecification = new NewMemberWithUniquePhoneNumberSpecification(memberDTO.Phone);
+        var newMemberWithUniqueEmailSpecification = new NewMemberWithUniqueEmailSpecification(memberToBeCreatedDTO.Email);
+        var newMemberWithUniquePhoneNumberSpecification = new NewMemberWithUniquePhoneNumberSpecification(memberToBeCreatedDTO.Phone);
 
         /* Check if passed Email already exits */
         if (await memberRepo.AnyAsync(ct,newMemberWithUniqueEmailSpecification))
@@ -123,27 +86,7 @@ public sealed class MemberService : IMemberService
         if (await memberRepo.AnyAsync(ct,newMemberWithUniquePhoneNumberSpecification))
             return Result.Failure(MemberBusinessErrors.MemberPhoneNumberAlreadyExists);
 
-        var member = new Member()
-        {
-            Name = memberDTO.Name,
-            Email = memberDTO.Email,
-            Phone = memberDTO.Phone,
-            Gender = memberDTO.Gender,
-            DateOfBirth = memberDTO.DateOfBirth,
-            Address = new()
-            {
-                BuildingNumber = memberDTO.BuildingNumber,
-                Street = memberDTO.Street,
-                City = memberDTO.City
-            },
-            HealthRecord = new()
-            {
-                Height = memberDTO.HealthRecord.Height,
-                Weight = memberDTO.HealthRecord.Weight,
-                BloodType = memberDTO.HealthRecord.BloodType,
-                Note = memberDTO.HealthRecord.Note
-            }
-        };
+        var member = _mapper.Map<Member>(memberToBeCreatedDTO);
 
         memberRepo.Add(member);
 
@@ -164,23 +107,14 @@ public sealed class MemberService : IMemberService
         if (memberToBeEdited is null)
             return Result<MemberToBeEditedDTO>.Failure(MemberBusinessErrors.MemberNotEdited);
 
-        return Result<MemberToBeEditedDTO>.Success(new()
-        {
-            Photo = memberToBeEdited.Photo,
-            Name = memberToBeEdited.Name,
-            Email = memberToBeEdited.Email,
-            Phone = memberToBeEdited.Phone,
-            BuildingNumber = memberToBeEdited.Address.BuildingNumber,
-            Street = memberToBeEdited.Address.Street,
-            City = memberToBeEdited.Address.City
-        });
+        return Result<MemberToBeEditedDTO>.Success(_mapper.Map<MemberToBeEditedDTO>(memberToBeEdited));
     }
 
-    public async Task<Result> EditMemberAsync(Guid id, MemberToBeEditedDTO memberDTO, CancellationToken ct = default)
+    public async Task<Result> EditMemberAsync(Guid id, MemberToBeEditedDTO memberToBeEditedDTO, CancellationToken ct = default)
     {
         var memberRepo = _unitOfWork.GetGenericRepository<Member>();
-        var editMemberWithUniqueEmailSpecification = new EditMemberWithUniqueEmailSpecification(id, memberDTO.Email);
-        var editMemberWithUniquePhoneNumberSpecification = new EditMemberWithUniquePhoneNumberSpecification(id, memberDTO.Phone);
+        var editMemberWithUniqueEmailSpecification = new EditMemberWithUniqueEmailSpecification(id, memberToBeEditedDTO.Email);
+        var editMemberWithUniquePhoneNumberSpecification = new EditMemberWithUniquePhoneNumberSpecification(id, memberToBeEditedDTO.Phone);
 
         /* Check if passed Email already exits */
         if (await memberRepo.AnyAsync(ct, editMemberWithUniqueEmailSpecification))
@@ -195,11 +129,7 @@ public sealed class MemberService : IMemberService
         if(memberToBeEdited is null)
             return Result.Failure(MemberBusinessErrors.MemberToBeEditedNotFound);
 
-        memberToBeEdited.Email = memberDTO.Email;
-        memberToBeEdited.Phone = memberDTO.Phone;
-        memberToBeEdited.Address.BuildingNumber = memberDTO.BuildingNumber;
-        memberToBeEdited.Address.Street = memberDTO.Street;
-        memberToBeEdited.Address.City = memberDTO.City;
+        _mapper.Map(memberToBeEditedDTO,memberToBeEdited);
 
         memberRepo.Update(memberToBeEdited);
 

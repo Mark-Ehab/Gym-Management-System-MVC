@@ -1,4 +1,5 @@
-﻿using GymManagementSystem.BusinessLogic.BusinessSpecifictions.TrainerSpecifications;
+﻿using AutoMapper;
+using GymManagementSystem.BusinessLogic.BusinessSpecifictions.TrainerSpecifications;
 using GymManagementSystem.BusinessLogic.Contracts.Services;
 using GymManagementSystem.BusinessLogic.DTOs.TrainerDTOs;
 using GymManagementSystem.BusinessLogic.Helpers.BusinessErrors;
@@ -16,11 +17,13 @@ public sealed class TrainerService : ITrainerService
 {
     /* Fields */
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
     /* Constructor */
-    public TrainerService(IUnitOfWork unitOfWork)
+    public TrainerService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
 
     /* Methods */
@@ -33,14 +36,7 @@ public sealed class TrainerService : ITrainerService
         if (allTrainers is null)
             return [];
 
-        return allTrainers.Select(t => new AllTrainersDTO()
-        {
-            Id = t.Id,
-            Name = t.Name,
-            Email = t.Email,
-            Phone = t.Phone,
-            Speciality = t.Speciality
-        });
+        return _mapper.Map<IEnumerable<AllTrainersDTO>>(allTrainers);
     }
 
     public async Task<Result<TrainerDetailsDTO>> GetTrainerDetailsAsync(Guid id, CancellationToken ct)
@@ -52,26 +48,14 @@ public sealed class TrainerService : ITrainerService
         if (trainer is null)
             return Result<TrainerDetailsDTO>.Failure(TrainerBusinessErrors.TrainerDetailsNotFound);
 
-        var trainerDetailsDTO = new TrainerDetailsDTO()
-        {
-            Name = trainer.Name,
-            Email = trainer.Email,
-            Phone = trainer.Phone,
-            DateOBirth = trainer.DateOfBirth,
-            Speciality = trainer.Speciality,
-            BuildingNumber = trainer.Address.BuildingNumber,
-            Street = trainer.Address.Street,
-            City = trainer.Address.City
-        };
-
-        return Result<TrainerDetailsDTO>.Success(trainerDetailsDTO);
+        return Result<TrainerDetailsDTO>.Success(_mapper.Map<TrainerDetailsDTO>(trainer));
     }
 
-    public async Task<Result> AddTrainerAsync(TrainerCreateDTO trainerDTO, CancellationToken ct)
+    public async Task<Result> AddTrainerAsync(TrainerCreateDTO trainerToBeCreatedDTO, CancellationToken ct)
     {
         var trainerRepo = _unitOfWork.GetGenericRepository<Trainer>();
-        var newTrainerWithUniqueEmailSpecification = new NewTrainerWithUniqueEmailSpecification(trainerDTO.Email);
-        var newTrainerWithUniquePhoneNumberSpecification = new NewTrainerWithUniquePhoneNumberSpecification(trainerDTO.Phone);
+        var newTrainerWithUniqueEmailSpecification = new NewTrainerWithUniqueEmailSpecification(trainerToBeCreatedDTO.Email);
+        var newTrainerWithUniquePhoneNumberSpecification = new NewTrainerWithUniquePhoneNumberSpecification(trainerToBeCreatedDTO.Phone);
 
         /* Check if entered email already exists on the system */
         if (await trainerRepo.AnyAsync(ct,newTrainerWithUniqueEmailSpecification))
@@ -81,21 +65,7 @@ public sealed class TrainerService : ITrainerService
         if (await trainerRepo.AnyAsync(ct, newTrainerWithUniquePhoneNumberSpecification))
             return Result.Failure(TrainerBusinessErrors.TrainerPhoneNumberAlreadyExists);
 
-        var trainerToBeAdded = new Trainer()
-        {
-            Name = trainerDTO.Name,
-            Email = trainerDTO.Email,
-            Phone = trainerDTO.Phone,
-            DateOfBirth = trainerDTO.DateOfBirth,
-            Gender = trainerDTO.Gender,
-            Speciality = trainerDTO.Speciality,
-            Address = new()
-            {
-                BuildingNumber = trainerDTO.BuildingNumber,
-                Street = trainerDTO.Street,
-                City = trainerDTO.City,
-            }
-        };
+        var trainerToBeAdded = _mapper.Map<Trainer>(trainerToBeCreatedDTO);
 
         trainerRepo.Add(trainerToBeAdded);
 
@@ -116,18 +86,7 @@ public sealed class TrainerService : ITrainerService
         if (trainerToBeEdited is null)
             return Result<TrainerToBeEditedDTO>.Failure(TrainerBusinessErrors.TrainerToBeEditedNotFound);
 
-        var trainerToBeEditedDTO = new TrainerToBeEditedDTO()
-        {
-            Name = trainerToBeEdited.Name,
-            Email = trainerToBeEdited.Email,
-            Phone = trainerToBeEdited.Phone,
-            Speciality = trainerToBeEdited.Speciality,
-            BuildingNumber = trainerToBeEdited.Address.BuildingNumber,
-            Street = trainerToBeEdited.Address.Street,
-            City = trainerToBeEdited.Address.City,
-        };
-
-        return Result<TrainerToBeEditedDTO>.Success(trainerToBeEditedDTO);
+        return Result<TrainerToBeEditedDTO>.Success(_mapper.Map<TrainerToBeEditedDTO>(trainerToBeEdited));
     }
 
     public async Task<Result> EditTrainerAsync(Guid id, TrainerToBeEditedDTO trainerToBeEditedDTO, CancellationToken ct)
@@ -149,12 +108,7 @@ public sealed class TrainerService : ITrainerService
         if (trainerToBeEdited is null)
             return Result.Failure(TrainerBusinessErrors.TrainerToBeEditedNotFound);
 
-        trainerToBeEdited.Email = trainerToBeEditedDTO.Email;
-        trainerToBeEdited.Phone = trainerToBeEditedDTO.Phone;
-        trainerToBeEdited.Speciality = trainerToBeEditedDTO.Speciality;
-        trainerToBeEdited.Address.BuildingNumber = trainerToBeEditedDTO.BuildingNumber;
-        trainerToBeEdited.Address.Street = trainerToBeEditedDTO.Street;
-        trainerToBeEdited.Address.City = trainerToBeEditedDTO.City;
+        _mapper.Map(trainerToBeEditedDTO, trainerToBeEdited);
 
         trainerRepo.Update(trainerToBeEdited);
 

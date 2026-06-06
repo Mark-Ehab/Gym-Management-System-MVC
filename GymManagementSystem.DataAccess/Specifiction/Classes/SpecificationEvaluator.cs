@@ -17,11 +17,11 @@ public static class SpecificationEvaluator<TEntity> where TEntity : BaseEntity, 
         if(specification.Criteria is not null)
             query = query.Where(specification.Criteria);
 
-        if (!specification.IncludeLambdas.IsNullOrEmpty())
+        if (specification.IncludeLambdas.Count > 0)
             query = specification.IncludeLambdas.Aggregate(query,(current, Include)
                     => Include(current));
 
-        if(!specification.OrderBys.IsNullOrEmpty())
+        if(specification.OrderBys.Count > 0)
         {
             var firstOrderBy = specification.OrderBys.FirstOrDefault();
             var orderedQuery = firstOrderBy!.IsDescending ? 

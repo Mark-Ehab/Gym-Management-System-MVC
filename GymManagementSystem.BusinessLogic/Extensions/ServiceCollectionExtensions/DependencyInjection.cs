@@ -1,4 +1,5 @@
 ﻿using GymManagementSystem.BusinessLogic.Contracts.Services;
+using GymManagementSystem.BusinessLogic.MappingProfiles;
 using GymManagementSystem.BusinessLogic.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,7 @@ public static class DependencyInjection
         services.AddScoped<IPlanService, PlanService>();
         services.AddScoped<IMemberService, MemberService>();
         services.AddScoped<ITrainerService, TrainerService>();
+        services.AddAutoMapper(config => config.AddProfiles([new MemberMappingProfile(),new TrainerMappingProfile(),new PlanMappingProfile()]));
 
         return services;
     }

@@ -56,7 +56,7 @@ public sealed class TrainersController : Controller
             Name = trainerDetailsDTOResult.Value.Name,
             Email = trainerDetailsDTOResult.Value.Email,
             Phone = trainerDetailsDTOResult.Value.Phone,
-            DateOfBirth = trainerDetailsDTOResult.Value.DateOBirth.ToString(),
+            DateOfBirth = trainerDetailsDTOResult.Value.DateOfBirth.ToString(),
             Specialization = trainerDetailsDTOResult.Value.Speciality.ToString(),
             Address = string.Join(" - ", trainerDetailsDTOResult.Value.BuildingNumber, trainerDetailsDTOResult.Value.Street, trainerDetailsDTOResult.Value.City)
         };
