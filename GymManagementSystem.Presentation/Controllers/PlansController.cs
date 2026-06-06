@@ -47,9 +47,9 @@ public sealed class PlansController : Controller
     [HttpGet]
     public async Task<IActionResult> Details(Guid id, CancellationToken ct)
     {
-        var planDetailsDTOResult = await _planService.GetPlanDetailsAsync(id,ct);
+        var planDetailsDTOResult = await _planService.GetPlanDetailsAsync(id, ct);
 
-        if(planDetailsDTOResult.IsFailure)
+        if (planDetailsDTOResult.IsFailure)
         {
             TempData["FailureAlert"] = planDetailsDTOResult.Error!.Description;
             return RedirectToAction(nameof(Index));
@@ -82,8 +82,8 @@ public sealed class PlansController : Controller
         var planToBeEditedViewModel = new PlanToBeEditedViewModel()
         {
             Name = planTobeEditedDTOResult.Value.Name,
-            Price= planTobeEditedDTOResult.Value.Price,
-            Description= planTobeEditedDTOResult.Value.Description,
+            Price = planTobeEditedDTOResult.Value.Price,
+            Description = planTobeEditedDTOResult.Value.Description,
             DurationDays = planTobeEditedDTOResult.Value.DurationDays
         };
 
@@ -106,7 +106,7 @@ public sealed class PlansController : Controller
             DurationDays = model.DurationDays
         };
 
-        var result = await _planService.UpdatePlanToBeEditedAsync(id,modelDTO,ct);
+        var result = await _planService.UpdatePlanToBeEditedAsync(id, modelDTO, ct);
 
         if (result.IsSuccessful)
         {

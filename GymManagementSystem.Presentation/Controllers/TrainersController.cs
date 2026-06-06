@@ -43,7 +43,7 @@ public sealed class TrainersController : Controller
     [HttpGet]
     public async Task<IActionResult> Details(Guid id, CancellationToken ct)
     {
-        var trainerDetailsDTOResult = await _trainerService.GetTrainerDetailsAsync(id,ct);
+        var trainerDetailsDTOResult = await _trainerService.GetTrainerDetailsAsync(id, ct);
 
         if (trainerDetailsDTOResult.IsFailure)
         {
@@ -72,16 +72,16 @@ public sealed class TrainersController : Controller
     // POST BaseURL/Trainers/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(TrainerCreateViewModel model ,CancellationToken ct)
+    public async Task<IActionResult> Create(TrainerCreateViewModel model, CancellationToken ct)
     {
-        if(!ModelState.IsValid)
+        if (!ModelState.IsValid)
             return View(model);
 
         var trainerCreateDTO = new TrainerCreateDTO()
-        { 
-            Name=model.Name,
-            Email=model.Email,
-            Phone=model.Phone,
+        {
+            Name = model.Name,
+            Email = model.Email,
+            Phone = model.Phone,
             Gender = model.Gender,
             DateOfBirth = model.DateOfBirth,
             Speciality = model.Specialties,
@@ -90,7 +90,7 @@ public sealed class TrainersController : Controller
             Street = model.Street
         };
 
-        var result = await _trainerService.AddTrainerAsync(trainerCreateDTO,ct);
+        var result = await _trainerService.AddTrainerAsync(trainerCreateDTO, ct);
 
         if (result.IsSuccessful)
         {
@@ -106,9 +106,9 @@ public sealed class TrainersController : Controller
 
     // GET BaseURL/Trainers/Edit/{id}
     [HttpGet]
-    public async Task<IActionResult> Edit(Guid id ,CancellationToken ct)
+    public async Task<IActionResult> Edit(Guid id, CancellationToken ct)
     {
-        var trainerToBeEditedDTOResult = await _trainerService.GetTrainerToBeEditedAsync(id,ct);
+        var trainerToBeEditedDTOResult = await _trainerService.GetTrainerToBeEditedAsync(id, ct);
 
         if (trainerToBeEditedDTOResult.IsFailure)
         {
@@ -133,9 +133,9 @@ public sealed class TrainersController : Controller
     // POST BaseURL/Trainers/Edit/{id}
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit([FromRoute] Guid id ,TrainerToBeEditedViewModel model ,CancellationToken ct)
+    public async Task<IActionResult> Edit([FromRoute] Guid id, TrainerToBeEditedViewModel model, CancellationToken ct)
     {
-        if(!ModelState.IsValid)
+        if (!ModelState.IsValid)
             return View(model);
 
         var trainerToBeEditedDTO = new TrainerToBeEditedDTO()
@@ -149,7 +149,7 @@ public sealed class TrainersController : Controller
             City = model.City,
         };
 
-        var result = await _trainerService.EditTrainerAsync(id,trainerToBeEditedDTO,ct);
+        var result = await _trainerService.EditTrainerAsync(id, trainerToBeEditedDTO, ct);
 
         if (result.IsSuccessful)
         {

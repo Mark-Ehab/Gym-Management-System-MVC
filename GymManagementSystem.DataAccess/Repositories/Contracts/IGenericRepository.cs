@@ -1,4 +1,5 @@
 ﻿using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Specifiction.Contract;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -13,7 +14,8 @@ public interface IGenericRepository<TEntity> where TEntity : BaseEntity, new()
     void Add(TEntity entity);
     void Update(TEntity entity);
     void SoftDelete(TEntity entity);
-    Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity,bool>> predicate, CancellationToken ct, bool TrackingEnabled = false);
-    Task<bool> AnyAsync(Expression<Func<TEntity,bool>> predicate, CancellationToken ct);
+    Task<TEntity?> FirstOrDefaultAsync(CancellationToken ct, ISpecificaion<TEntity>? specificaion = null, bool TrackingEnabled = false);
+    Task<bool> AnyAsync(CancellationToken ct, ISpecificaion<TEntity>? specificaion = null);
+    Task<IEnumerable<TEntity>> ListAsync(ISpecificaion<TEntity> specificaion, CancellationToken ct, bool TrackingEnabled = false);
     Task<int> SaveChangesAsync(CancellationToken ct);
 }

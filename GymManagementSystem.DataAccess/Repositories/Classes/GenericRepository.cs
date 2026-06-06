@@ -1,6 +1,8 @@
 ﻿using GymManagementSystem.DataAccess.Data.Contexts;
 using GymManagementSystem.DataAccess.Models;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
+using GymManagementSystem.DataAccess.Specifiction.Classes;
+using GymManagementSystem.DataAccess.Specifiction.Contract;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -56,14 +58,27 @@ public sealed class GenericRepository<TEntity> : IGenericRepository<TEntity> whe
         => _entityDbSet.Remove(entity);    
 
     public void Update(TEntity entity)
-        => _entityDbSet.Update(entity);    
+        => _entityDbSet.Update(entity);
 
-    public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct, bool TrackingEnabled = false)
-        => !TrackingEnabled ? await _entityDbSet.AsNoTracking().FirstOrDefaultAsync(predicate,ct) : await _entityDbSet.FirstOrDefaultAsync(predicate, ct);
-   
-    public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct)
-        => await _entityDbSet.AnyAsync(predicate,ct);
+    public async Task<TEntity?> FirstOrDefaultAsync(CancellationToken ct, ISpecificaion<TEntity>? specificaion = null, bool TrackingEnabled = false)
+    {
+        if (specificaion is not null)
+            return !TrackingEnabled ? await ApplySpecification(specificaion).AsNoTracking().FirstOrDefaultAsync(ct) : await ApplySpecification(specificaion).FirstOrDefaultAsync(ct);
+        
+        return !TrackingEnabled ? await _entityDbSet.AsNoTracking().FirstOrDefaultAsync(ct) : await _entityDbSet.FirstOrDefaultAsync(ct);
+    }
+
+    public async Task<bool> AnyAsync(CancellationToken ct, ISpecificaion<TEntity>? specificaion = null)
+        => specificaion is not null ?
+            await ApplySpecification(specificaion).AnyAsync(ct) :
+            await _entityDbSet.AnyAsync(ct);
+
+    public async Task<IEnumerable<TEntity>> ListAsync(ISpecificaion<TEntity> specificaion, CancellationToken ct, bool TrackingEnabled = false)
+        => !TrackingEnabled ? await ApplySpecification(specificaion).AsNoTracking().ToListAsync(ct) : await ApplySpecification(specificaion).ToListAsync(ct);
 
     public async Task<int> SaveChangesAsync(CancellationToken ct)
         => await _gymDbContext.SaveChangesAsync(ct);
+
+    private IQueryable<TEntity> ApplySpecification(ISpecificaion<TEntity> specificaion)
+        => SpecificationEvaluator<TEntity>.GetQuery(_entityDbSet, specificaion);
 }

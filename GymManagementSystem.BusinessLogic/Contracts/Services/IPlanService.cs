@@ -12,6 +12,6 @@ public interface IPlanService
     Task<IEnumerable<AllPlansDTO>> GetAllPlansAsync(CancellationToken ct = default);
     Task<Result<PlanDetailsDTO>> GetPlanDetailsAsync(Guid id, CancellationToken ct = default);
     Task<Result<PlanToBeEditedDTO>> GetPlanToBeEditedAsync(Guid id, CancellationToken ct = default);
-    Task<Result> UpdatePlanToBeEditedAsync(Guid id, PlanToBeEditedDTO planDTO , CancellationToken ct = default);
-    Task<Result> ChangePlanStatusAsync(Guid id , CancellationToken ct = default);
+    Task<Result> UpdatePlanToBeEditedAsync(Guid id, PlanToBeEditedDTO planDTO, CancellationToken ct = default);
+    Task<Result> ChangePlanStatusAsync(Guid id, CancellationToken ct = default);
 }

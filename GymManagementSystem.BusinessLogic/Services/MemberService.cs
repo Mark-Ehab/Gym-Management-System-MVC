@@ -1,4 +1,6 @@
-﻿using GymManagementSystem.BusinessLogic.Contracts.Services;
+﻿using GymManagementSystem.BusinessLogic.BusinessSpecifictions;
+using GymManagementSystem.BusinessLogic.BusinessSpecifictions.MemberSpecifications;
+using GymManagementSystem.BusinessLogic.Contracts.Services;
 using GymManagementSystem.BusinessLogic.DTOs.HealthRecordDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.MemberDTOs;
 using GymManagementSystem.BusinessLogic.Helpers.BusinessErrors;
@@ -50,8 +52,9 @@ public sealed class MemberService : IMemberService
     public async Task<Result<MemberDetailsDTO>> GetMemberDetailsAsync(Guid id, CancellationToken ct = default)
     {
         var memberRepo = _unitOfWork.GetGenericRepository<Member>();
+        var memberDetailsWithActiveMembershipSpecification = new MemberDetailsWithActiveMembershipSpecification(id);
 
-        var member = await memberRepo.GetByIdAsync(id,ct);
+        var member = await memberRepo.FirstOrDefaultAsync(ct,memberDetailsWithActiveMembershipSpecification);
 
         if(member is null)
             return Result<MemberDetailsDTO>.Failure(MemberBusinessErrors.MemberDetailsNotFound);
@@ -64,22 +67,25 @@ public sealed class MemberService : IMemberService
             Phone = member.Phone,
             DateOfBirth = member.DateOfBirth,
             Address = string.Join(" - ", member.Address.BuildingNumber, member.Address.Street, member.Address.City),
-            Gender = member.Gender
+            Gender = member.Gender,
+            MembershipStartDate = member.Memberships.FirstOrDefault()?.StartDate,
+            MembershipEndDate = member.Memberships.FirstOrDefault()?.EndDate,
+            PlanName = member.Memberships.FirstOrDefault()?.Plan.Name
         };
 
-        var membershipRepo = _unitOfWork.GetGenericRepository<Membership>();
+        //var membershipRepo = _unitOfWork.GetGenericRepository<Membership>();
 
-        var latestMemberActiveMembership = await membershipRepo.FirstOrDefaultAsync(ms => ms.MemberId == id,ct);
+        //var latestMemberActiveMembership = await membershipRepo.FirstOrDefaultAsync(ms => ms.MemberId == id,ct);
 
-        if (latestMemberActiveMembership is not null)
-        {
-            var planRepo = _unitOfWork.GetGenericRepository<Plan>();
-            var latestPlan = await planRepo.GetByIdAsync(latestMemberActiveMembership.PlanId, ct);
-            var latestPlanName = latestPlan!.Name;
-            memberDetailsDTO.MembershipStartDate = latestMemberActiveMembership.StartDate;
-            memberDetailsDTO.MembershipEndDate = latestMemberActiveMembership.EndDate;
-            memberDetailsDTO.PlanName = latestPlanName;
-        }
+        //if (latestMemberActiveMembership is not null)
+        //{
+        //    var planRepo = _unitOfWork.GetGenericRepository<Plan>();
+        //    var latestPlan = await planRepo.GetByIdAsync(latestMemberActiveMembership.PlanId, ct);
+        //    var latestPlanName = latestPlan!.Name;
+        //    memberDetailsDTO.MembershipStartDate = latestMemberActiveMembership.StartDate;
+        //    memberDetailsDTO.MembershipEndDate = latestMemberActiveMembership.EndDate;
+        //    memberDetailsDTO.PlanName = latestPlanName;
+        //}
 
         return Result<MemberDetailsDTO>.Success(memberDetailsDTO);
     }
@@ -87,8 +93,8 @@ public sealed class MemberService : IMemberService
     public async Task<Result<HealthRecordDTO>> GetMemberHealthRecordDetailsAsync(Guid id, CancellationToken ct = default)
     {
         var healthRepo = _unitOfWork.GetGenericRepository<HealthRecord>();
-
-        var healthRecord = await healthRepo.FirstOrDefaultAsync(hr => hr.MemberId == id,ct);
+        var memberHealthRecordDetailsSpecification = new MemberHealthRecordDetailsSpecification(id);
+        var healthRecord = await healthRepo.FirstOrDefaultAsync(ct, memberHealthRecordDetailsSpecification);
 
         if(healthRecord is null)
             return Result<HealthRecordDTO>.Failure(MemberBusinessErrors.MemberHealthRecordDetailsNotFound);
@@ -106,12 +112,15 @@ public sealed class MemberService : IMemberService
     {
         var memberRepo = _unitOfWork.GetGenericRepository<Member>();
 
+        var newMemberWithUniqueEmailSpecification = new NewMemberWithUniqueEmailSpecification(memberDTO.Email);
+        var newMemberWithUniquePhoneNumberSpecification = new NewMemberWithUniquePhoneNumberSpecification(memberDTO.Phone);
+
         /* Check if passed Email already exits */
-        if (await memberRepo.AnyAsync(m => m.Email == memberDTO.Email,ct))
+        if (await memberRepo.AnyAsync(ct,newMemberWithUniqueEmailSpecification))
             return Result.Failure(MemberBusinessErrors.MemberEmailAlreadyExists);
 
         /* Check if passed Phone already exits */
-        if (await memberRepo.AnyAsync(m => m.Phone == memberDTO.Phone,ct))
+        if (await memberRepo.AnyAsync(ct,newMemberWithUniquePhoneNumberSpecification))
             return Result.Failure(MemberBusinessErrors.MemberPhoneNumberAlreadyExists);
 
         var member = new Member()
@@ -170,13 +179,15 @@ public sealed class MemberService : IMemberService
     public async Task<Result> EditMemberAsync(Guid id, MemberToBeEditedDTO memberDTO, CancellationToken ct = default)
     {
         var memberRepo = _unitOfWork.GetGenericRepository<Member>();
+        var editMemberWithUniqueEmailSpecification = new EditMemberWithUniqueEmailSpecification(id, memberDTO.Email);
+        var editMemberWithUniquePhoneNumberSpecification = new EditMemberWithUniquePhoneNumberSpecification(id, memberDTO.Phone);
 
         /* Check if passed Email already exits */
-        if (await memberRepo.AnyAsync(m => m.Email == memberDTO.Email && m.Id != id, ct))
+        if (await memberRepo.AnyAsync(ct, editMemberWithUniqueEmailSpecification))
             return Result.Failure(MemberBusinessErrors.MemberEmailAlreadyExists);
 
         /* Check if passed Phone already exits */
-        if (await memberRepo.AnyAsync(m => m.Phone == memberDTO.Phone && m.Id != id, ct))
+        if (await memberRepo.AnyAsync(ct, editMemberWithUniquePhoneNumberSpecification))
             return Result.Failure(MemberBusinessErrors.MemberPhoneNumberAlreadyExists);
 
         var memberToBeEdited = await memberRepo.GetByIdAsync(id,ct);
@@ -206,12 +217,13 @@ public sealed class MemberService : IMemberService
 
         var memberToBeDeleted = await memberRepo.GetByIdAsync(id, ct);
 
-        if(memberToBeDeleted is null)
+        if (memberToBeDeleted is null)
             return Result.Failure(MemberBusinessErrors.MemberToBeDeletedNotFound);
 
         var bookingRepo = _unitOfWork.GetGenericRepository<Booking>();
+        var memberActiveCurrentOrFutureBookingsSpecification = new MemberActiveCurrentOrFutureBookingsSpecification(id);
 
-        var memberHasActiveCurrentOrFutureBookings = await bookingRepo.AnyAsync(b => b.MemberId == id && b.Session.StartDate >= DateTime.UtcNow,ct);
+        var memberHasActiveCurrentOrFutureBookings = await bookingRepo.AnyAsync(ct,memberActiveCurrentOrFutureBookingsSpecification);
 
         if (memberHasActiveCurrentOrFutureBookings)
             return Result.Failure(MemberBusinessErrors.MemberWithActiveCurrentOrFutureBookingsCannotBeDeleted);

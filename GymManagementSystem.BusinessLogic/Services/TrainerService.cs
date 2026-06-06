@@ -1,4 +1,5 @@
-﻿using GymManagementSystem.BusinessLogic.Contracts.Services;
+﻿using GymManagementSystem.BusinessLogic.BusinessSpecifictions.TrainerSpecifications;
+using GymManagementSystem.BusinessLogic.Contracts.Services;
 using GymManagementSystem.BusinessLogic.DTOs.TrainerDTOs;
 using GymManagementSystem.BusinessLogic.Helpers.BusinessErrors;
 using GymManagementSystem.BusinessLogic.Results;
@@ -69,23 +70,25 @@ public sealed class TrainerService : ITrainerService
     public async Task<Result> AddTrainerAsync(TrainerCreateDTO trainerDTO, CancellationToken ct)
     {
         var trainerRepo = _unitOfWork.GetGenericRepository<Trainer>();
+        var newTrainerWithUniqueEmailSpecification = new NewTrainerWithUniqueEmailSpecification(trainerDTO.Email);
+        var newTrainerWithUniquePhoneNumberSpecification = new NewTrainerWithUniquePhoneNumberSpecification(trainerDTO.Phone);
 
         /* Check if entered email already exists on the system */
-        if (await trainerRepo.AnyAsync(t => t.Email == trainerDTO.Email,ct))
+        if (await trainerRepo.AnyAsync(ct,newTrainerWithUniqueEmailSpecification))
             return Result.Failure(TrainerBusinessErrors.TrainerEmailAlreadyExists);
 
         /* Check if entered phone already exists on the system */
-        if (await trainerRepo.AnyAsync(t => t.Phone == trainerDTO.Phone,ct))
+        if (await trainerRepo.AnyAsync(ct, newTrainerWithUniquePhoneNumberSpecification))
             return Result.Failure(TrainerBusinessErrors.TrainerPhoneNumberAlreadyExists);
 
         var trainerToBeAdded = new Trainer()
         {
-            Name= trainerDTO.Name,
-            Email= trainerDTO.Email,
-            Phone= trainerDTO.Phone,
+            Name = trainerDTO.Name,
+            Email = trainerDTO.Email,
+            Phone = trainerDTO.Phone,
             DateOfBirth = trainerDTO.DateOfBirth,
             Gender = trainerDTO.Gender,
-            Speciality= trainerDTO.Speciality,
+            Speciality = trainerDTO.Speciality,
             Address = new()
             {
                 BuildingNumber = trainerDTO.BuildingNumber,
@@ -130,25 +133,27 @@ public sealed class TrainerService : ITrainerService
     public async Task<Result> EditTrainerAsync(Guid id, TrainerToBeEditedDTO trainerToBeEditedDTO, CancellationToken ct)
     {
         var trainerRepo = _unitOfWork.GetGenericRepository<Trainer>();
+        var editTrainerWithUniqueEmailSpecification = new EditTrainerWithUniqueEmailSpecification(id,trainerToBeEditedDTO.Email);
+        var editTrainerWithUniquePhoneNumberSpecification = new EditTrainerWithUniquePhoneNumberSpecification(id,trainerToBeEditedDTO.Phone);
 
         /* Check if email already exists on the system */
-        if (await trainerRepo.AnyAsync(t => t.Email == trainerToBeEditedDTO.Email && t.Id != id, ct))
+        if (await trainerRepo.AnyAsync(ct, editTrainerWithUniqueEmailSpecification))
             return Result.Failure(TrainerBusinessErrors.TrainerEmailAlreadyExists);
 
         /* Check if phone already exists on the system */
-        if (await trainerRepo.AnyAsync(t => t.Phone == trainerToBeEditedDTO.Phone && t.Id != id, ct))
+        if (await trainerRepo.AnyAsync(ct, editTrainerWithUniquePhoneNumberSpecification))
             return Result.Failure(TrainerBusinessErrors.TrainerPhoneNumberAlreadyExists);
 
-        var trainerToBeEdited = await trainerRepo.GetByIdAsync(id,ct);
+        var trainerToBeEdited = await trainerRepo.GetByIdAsync(id, ct);
 
-        if(trainerToBeEdited is null)
+        if (trainerToBeEdited is null)
             return Result.Failure(TrainerBusinessErrors.TrainerToBeEditedNotFound);
 
         trainerToBeEdited.Email = trainerToBeEditedDTO.Email;
         trainerToBeEdited.Phone = trainerToBeEditedDTO.Phone;
         trainerToBeEdited.Speciality = trainerToBeEditedDTO.Speciality;
-        trainerToBeEdited.Address.BuildingNumber = trainerToBeEditedDTO.BuildingNumber; 
-        trainerToBeEdited.Address.Street = trainerToBeEditedDTO.Street; 
+        trainerToBeEdited.Address.BuildingNumber = trainerToBeEditedDTO.BuildingNumber;
+        trainerToBeEdited.Address.Street = trainerToBeEditedDTO.Street;
         trainerToBeEdited.Address.City = trainerToBeEditedDTO.City;
 
         trainerRepo.Update(trainerToBeEdited);
@@ -171,10 +176,11 @@ public sealed class TrainerService : ITrainerService
             return Result.Failure(TrainerBusinessErrors.TrainerToBeDeletedNotFound);
 
         var sessionRepo = _unitOfWork.GetGenericRepository<Session>();
+        var trainerHasScheduledSessionsSpecification = new TrainerHasScheduledSessionsSpecification(id);
 
-        var trainerHasScheduledSessions = await sessionRepo.AnyAsync(s => s.TrainerId == id, ct);
+        var trainerHasScheduledSessions = await sessionRepo.AnyAsync(ct, trainerHasScheduledSessionsSpecification);
 
-        if(trainerHasScheduledSessions)
+        if (trainerHasScheduledSessions)
             return Result.Failure(TrainerBusinessErrors.TrainerWithScheduledSessionsCannotBeDeleted);
 
         trainerRepo.SoftDelete(trainerToBeDeleted);
