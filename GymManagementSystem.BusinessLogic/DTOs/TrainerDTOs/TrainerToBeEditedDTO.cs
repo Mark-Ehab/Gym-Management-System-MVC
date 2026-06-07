@@ -7,7 +7,7 @@ namespace GymManagementSystem.BusinessLogic.DTOs.TrainerDTOs;
 
 public sealed class TrainerToBeEditedDTO
 {
-    public string Name { get; set; } = default!;
+    public string? Name { get; set; } 
     public string Email { get; set; } = default!;
     public string Phone { get; set; } = default!;
     public Speciality Speciality { get; set; }

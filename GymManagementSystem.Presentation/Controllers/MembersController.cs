@@ -1,4 +1,5 @@
-﻿using GymManagementSystem.BusinessLogic.Contracts.Services;
+﻿using AutoMapper;
+using GymManagementSystem.BusinessLogic.Contracts.Services;
 using GymManagementSystem.BusinessLogic.DTOs.HealthRecordDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.MemberDTOs;
 using GymManagementSystem.DataAccess.Enums;
@@ -11,11 +12,13 @@ public sealed class MembersController : Controller
 {
     /* Fields */
     private readonly IMemberService _memberService;
+    private readonly IMapper _mapper;
 
     /* Constructor */
-    public MembersController(IMemberService service)
+    public MembersController(IMemberService service,IMapper mapper)
     {
         _memberService = service;
+        _mapper = mapper;
     }
 
     /* Actions (Endpoints) */
@@ -29,15 +32,7 @@ public sealed class MembersController : Controller
         if (!allMembersDTOs.Any())
             return View();
 
-        var allMembersViewModels = allMembersDTOs.Select(amd => new AllMembersViewModel
-        {
-            Id = amd.Id,
-            Name = amd.Name,
-            Email = amd.Email,
-            Gender = amd.Gender.ToString(),
-            Phone = amd.Phone,
-            Photo = amd.Photo
-        });
+        var allMembersViewModels = _mapper.Map<IEnumerable<AllMembersViewModel>>(allMembersDTOs);
 
         return View(allMembersViewModels);
     }
@@ -54,19 +49,7 @@ public sealed class MembersController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var memberDetailsViewModel = new MemberDetailsViewModel
-        {
-            Photo = memberDetailsDTOResult.Value.Photo,
-            Name = memberDetailsDTOResult.Value.Name,
-            Email = memberDetailsDTOResult.Value.Email,
-            Phone = memberDetailsDTOResult.Value.Phone,
-            PlanName = memberDetailsDTOResult.Value.PlanName,
-            Gender = memberDetailsDTOResult.Value.Gender.ToString(),
-            Address = memberDetailsDTOResult.Value.Address,
-            DateOfBirth = memberDetailsDTOResult.Value.DateOfBirth.ToString(),
-            MembershipEndDate = memberDetailsDTOResult.Value.MembershipEndDate.ToString(),
-            MembershipStartDate = memberDetailsDTOResult.Value.MembershipStartDate.ToString()
-        };
+        var memberDetailsViewModel = _mapper.Map<MemberDetailsViewModel>(memberDetailsDTOResult.Value);
 
         return View(memberDetailsViewModel);
     }
@@ -83,23 +66,7 @@ public sealed class MembersController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var memberHealthRecordDetailsViewModel = new HealthRecordViewModel
-        {
-            Height = memberHealthRecordDetailsDTOResult.Value.Height,
-            Weight = memberHealthRecordDetailsDTOResult.Value.Weight,
-            BloodType = memberHealthRecordDetailsDTOResult.Value.BloodType switch
-            {
-                BloodType.APositive => "A+",
-                BloodType.BPositive => "B+",
-                BloodType.OPositive => "O+",
-                BloodType.ABPositive => "AB+",
-                BloodType.ANegative => "A-",
-                BloodType.BNegative => "B-",
-                BloodType.ONegative => "O-",
-                _ => "AB-",
-            },
-            Note = memberHealthRecordDetailsDTOResult.Value.Note
-        };
+        var memberHealthRecordDetailsViewModel = _mapper.Map<HealthRecordViewModel>(memberHealthRecordDetailsDTOResult.Value);
 
         return View(memberHealthRecordDetailsViewModel);
     }
@@ -117,34 +84,7 @@ public sealed class MembersController : Controller
         if(!ModelState.IsValid)
             return View(model);
 
-        var memberCreateDTO = new MemberCreateDTO()
-        {
-            Name = model.Name,
-            Email = model.Email,
-            Phone = model.Phone,
-            DateOfBirth = model.DateOfBirth,
-            Gender = model.Gender,
-            BuildingNumber = model.BuildingNumber,
-            Street = model.Street,
-            City = model.City,
-            HealthRecord = new HealthRecordDTO()
-            {
-                BloodType = model.HealthRecord.BloodType switch
-                {
-                    "A+" => BloodType.APositive,
-                    "B+" => BloodType.BPositive,
-                    "O+" => BloodType.OPositive,
-                    "AB+" => BloodType.ABPositive,
-                    "A-" => BloodType.ANegative,
-                    "B-" => BloodType.BNegative,
-                    "O-" => BloodType.ONegative,
-                    _ => BloodType.ABNegative,
-                },
-                Height = model.HealthRecord.Height,
-                Weight = model.HealthRecord.Weight,
-                Note = model.HealthRecord?.Note ?? "No Notes."
-            }
-        };
+        var memberCreateDTO = _mapper.Map<MemberCreateDTO>(model);
 
         var result = await _memberService.AddMemberAsync(memberCreateDTO,ct);
 
@@ -173,16 +113,7 @@ public sealed class MembersController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var memberToBeEditedViewModel = new MemberToBeEditedViewModel()
-        {
-            Photo = memberToBeEditedDTOResult.Value.Photo,
-            Name = memberToBeEditedDTOResult.Value.Name,
-            Email = memberToBeEditedDTOResult.Value.Email,
-            Phone = memberToBeEditedDTOResult.Value.Phone,
-            BuildingNumber = memberToBeEditedDTOResult.Value.BuildingNumber,
-            Street = memberToBeEditedDTOResult.Value.Street,
-            City = memberToBeEditedDTOResult.Value.City
-        };
+        var memberToBeEditedViewModel = _mapper.Map<MemberToBeEditedViewModel>(memberToBeEditedDTOResult.Value);
 
         return View(memberToBeEditedViewModel);
     }
@@ -195,16 +126,7 @@ public sealed class MembersController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var memberToBeEditedDTO = new MemberToBeEditedDTO()
-        {
-            Photo = model.Photo,
-            Name= model.Name,
-            Email= model.Email,
-            BuildingNumber= model.BuildingNumber,
-            City = model.City,
-            Phone = model.Phone,
-            Street = model.Street
-        };
+        var memberToBeEditedDTO = _mapper.Map<MemberToBeEditedDTO>(model);
 
         var result = await _memberService.EditMemberAsync(id, memberToBeEditedDTO, ct);
 

@@ -1,4 +1,5 @@
-﻿using GymManagementSystem.BusinessLogic.Contracts.Services;
+﻿using AutoMapper;
+using GymManagementSystem.BusinessLogic.Contracts.Services;
 using GymManagementSystem.BusinessLogic.DTOs.TrainerDTOs;
 using GymManagementSystem.BusinessLogic.Results;
 using GymManagementSystem.Presentation.ViewModels.TrainerViewModels;
@@ -10,11 +11,13 @@ public sealed class TrainersController : Controller
 {
     /* Fields */
     private readonly ITrainerService _trainerService;
+    private readonly IMapper _mapper;
 
     /* Constructor */
-    public TrainersController(ITrainerService service)
+    public TrainersController(ITrainerService service,IMapper mapper)
     {
         _trainerService = service;
+        _mapper = mapper;
     }
 
     /* Actions (Endpoints) */
@@ -27,14 +30,7 @@ public sealed class TrainersController : Controller
         if (allTrainersDTOs is null)
             return View();
 
-        var allTrainersViewModels = allTrainersDTOs.Select(atd => new AllTrainersViewModel()
-        {
-            Id = atd.Id,
-            Name = atd.Name,
-            Email = atd.Email,
-            Phone = atd.Phone,
-            Specialization = atd.Speciality.ToString()
-        });
+        var allTrainersViewModels = _mapper.Map<IEnumerable<AllTrainersViewModel>>(allTrainersDTOs);
 
         return View(allTrainersViewModels);
     }
@@ -51,15 +47,7 @@ public sealed class TrainersController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var trainerDetailsViewModel = new TrainerDetailsViewModel()
-        {
-            Name = trainerDetailsDTOResult.Value.Name,
-            Email = trainerDetailsDTOResult.Value.Email,
-            Phone = trainerDetailsDTOResult.Value.Phone,
-            DateOfBirth = trainerDetailsDTOResult.Value.DateOfBirth.ToString(),
-            Specialization = trainerDetailsDTOResult.Value.Speciality.ToString(),
-            Address = string.Join(" - ", trainerDetailsDTOResult.Value.BuildingNumber, trainerDetailsDTOResult.Value.Street, trainerDetailsDTOResult.Value.City)
-        };
+        var trainerDetailsViewModel = _mapper.Map<TrainerDetailsViewModel>(trainerDetailsDTOResult.Value);
 
         return View(trainerDetailsViewModel);
     }
@@ -77,18 +65,7 @@ public sealed class TrainersController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var trainerCreateDTO = new TrainerCreateDTO()
-        {
-            Name = model.Name,
-            Email = model.Email,
-            Phone = model.Phone,
-            Gender = model.Gender,
-            DateOfBirth = model.DateOfBirth,
-            Speciality = model.Specialties,
-            BuildingNumber = model.BuildingNumber,
-            City = model.City,
-            Street = model.Street
-        };
+        var trainerCreateDTO = _mapper.Map<TrainerCreateDTO>(model);
 
         var result = await _trainerService.AddTrainerAsync(trainerCreateDTO, ct);
 
@@ -116,16 +93,7 @@ public sealed class TrainersController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var trainerToBeEditedViewModel = new TrainerToBeEditedViewModel()
-        {
-            Name = trainerToBeEditedDTOResult.Value.Name,
-            Email = trainerToBeEditedDTOResult.Value.Email,
-            Phone = trainerToBeEditedDTOResult.Value.Phone,
-            Specialties = trainerToBeEditedDTOResult.Value.Speciality,
-            BuildingNumber = trainerToBeEditedDTOResult.Value.BuildingNumber,
-            Street = trainerToBeEditedDTOResult.Value.Street,
-            City = trainerToBeEditedDTOResult.Value.City
-        };
+        var trainerToBeEditedViewModel = _mapper.Map<TrainerToBeEditedViewModel>(trainerToBeEditedDTOResult.Value);
 
         return View(trainerToBeEditedViewModel);
     }
@@ -138,16 +106,7 @@ public sealed class TrainersController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var trainerToBeEditedDTO = new TrainerToBeEditedDTO()
-        {
-            Name = model.Name,
-            Email = model.Email,
-            Phone = model.Phone,
-            Speciality = model.Specialties,
-            BuildingNumber = model.BuildingNumber,
-            Street = model.Street,
-            City = model.City,
-        };
+        var trainerToBeEditedDTO = _mapper.Map<TrainerToBeEditedDTO>(model);
 
         var result = await _trainerService.EditTrainerAsync(id, trainerToBeEditedDTO, ct);
 

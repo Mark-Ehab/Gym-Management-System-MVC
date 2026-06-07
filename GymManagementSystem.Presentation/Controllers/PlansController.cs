@@ -1,4 +1,5 @@
-﻿using GymManagementSystem.BusinessLogic.Contracts.Services;
+﻿using AutoMapper;
+using GymManagementSystem.BusinessLogic.Contracts.Services;
 using GymManagementSystem.BusinessLogic.DTOs.PlanDTOs;
 using GymManagementSystem.DataAccess.Models;
 using GymManagementSystem.Presentation.ViewModels.PlanViewModels;
@@ -13,11 +14,13 @@ public sealed class PlansController : Controller
 {
     /* Fields */
     private readonly IPlanService _planService;
+    private readonly IMapper _mapper;
 
     /* Constructor */
-    public PlansController(IPlanService service)
+    public PlansController(IPlanService service, IMapper mapper)
     {
         _planService = service;
+        _mapper = mapper;
     }
 
     /* Actions (Endpoints) */
@@ -30,15 +33,7 @@ public sealed class PlansController : Controller
         if (!allPlansDTOs.Any())
             return View();
 
-        var allPlanViewModels = allPlansDTOs.Select(apd => new AllPlansViewModel
-        {
-            Id = apd.Id,
-            Name = apd.Name,
-            Price = apd.Price,
-            Description = apd.Description,
-            DurationDays = apd.DurationDays,
-            Active = apd.Status
-        });
+        var allPlanViewModels = _mapper.Map<IEnumerable<AllPlansViewModel>>(allPlansDTOs);
 
         return View(allPlanViewModels);
     }
@@ -55,14 +50,7 @@ public sealed class PlansController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var planDetailsViewModel = new PlanDetailsViewModel
-        {
-            Name = planDetailsDTOResult.Value.Name,
-            Price = planDetailsDTOResult.Value.Price,
-            Description = planDetailsDTOResult.Value.Description,
-            DurationDays = planDetailsDTOResult.Value.DurationDays,
-            Status = planDetailsDTOResult.Value.Status ? "Active" : "Inactive"
-        };
+        var planDetailsViewModel = _mapper.Map<PlanDetailsViewModel>(planDetailsDTOResult.Value);
 
         return View(planDetailsViewModel);
     }
@@ -79,13 +67,7 @@ public sealed class PlansController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var planToBeEditedViewModel = new PlanToBeEditedViewModel()
-        {
-            Name = planTobeEditedDTOResult.Value.Name,
-            Price = planTobeEditedDTOResult.Value.Price,
-            Description = planTobeEditedDTOResult.Value.Description,
-            DurationDays = planTobeEditedDTOResult.Value.DurationDays
-        };
+        var planToBeEditedViewModel = _mapper.Map<PlanToBeEditedViewModel>(planTobeEditedDTOResult.Value);
 
         return View(planToBeEditedViewModel);
     }
@@ -98,13 +80,7 @@ public sealed class PlansController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var modelDTO = new PlanToBeEditedDTO()
-        {
-            Name = model.Name,
-            Price = model.Price,
-            Description = model.Description,
-            DurationDays = model.DurationDays
-        };
+        var modelDTO = _mapper.Map<PlanToBeEditedDTO>(model); 
 
         var result = await _planService.UpdatePlanToBeEditedAsync(id, modelDTO, ct);
 
