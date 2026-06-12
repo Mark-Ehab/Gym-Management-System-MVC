@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GymManagementSystem.BusinessLogic.BusinessSpecifictions;
+using GymManagementSystem.BusinessLogic.BusinessSpecifictions.HealthRecordSpecifications;
 using GymManagementSystem.BusinessLogic.BusinessSpecifictions.MemberSpecifications;
 using GymManagementSystem.BusinessLogic.Contracts.Services;
 using GymManagementSystem.BusinessLogic.DTOs.HealthRecordDTOs;
@@ -36,9 +37,9 @@ public sealed class MemberService : IMemberService
     {
         var memberRepo = _unitOfWork.GetGenericRepository<Member>();
 
-        var allMembers = await memberRepo.GetAllAsync(ct);
+        var allMembers = await memberRepo.GetAllAsync(ct: ct);
 
-        if (allMembers is null)
+        if (allMembers is null || allMembers.Count == 0)
             return [];
 
         return _mapper.Map<IEnumerable<AllMembersDTO>>(allMembers);
@@ -49,7 +50,7 @@ public sealed class MemberService : IMemberService
         var memberRepo = _unitOfWork.GetGenericRepository<Member>();
         var memberDetailsWithActiveMembershipSpecification = new MemberDetailsWithActiveMembershipSpecification(id);
 
-        var member = await memberRepo.FirstOrDefaultAsync(ct,memberDetailsWithActiveMembershipSpecification);
+        var member = await memberRepo.FirstOrDefaultAsync(memberDetailsWithActiveMembershipSpecification, ct: ct);
 
         if(member is null)
             return Result<MemberDetailsDTO>.Failure(MemberBusinessErrors.MemberDetailsNotFound);
@@ -63,7 +64,7 @@ public sealed class MemberService : IMemberService
     {
         var healthRepo = _unitOfWork.GetGenericRepository<HealthRecord>();
         var memberHealthRecordDetailsSpecification = new MemberHealthRecordDetailsSpecification(id);
-        var healthRecord = await healthRepo.FirstOrDefaultAsync(ct, memberHealthRecordDetailsSpecification);
+        var healthRecord = await healthRepo.FirstOrDefaultAsync(memberHealthRecordDetailsSpecification, ct: ct);
 
         if(healthRecord is null)
             return Result<HealthRecordDTO>.Failure(MemberBusinessErrors.MemberHealthRecordDetailsNotFound);
@@ -79,11 +80,11 @@ public sealed class MemberService : IMemberService
         var newMemberWithUniquePhoneNumberSpecification = new NewMemberWithUniquePhoneNumberSpecification(memberToBeCreatedDTO.Phone);
 
         /* Check if passed Email already exits */
-        if (await memberRepo.AnyAsync(ct,newMemberWithUniqueEmailSpecification))
+        if (await memberRepo.AnyAsync(newMemberWithUniqueEmailSpecification, ct))
             return Result.Failure(MemberBusinessErrors.MemberEmailAlreadyExists);
 
         /* Check if passed Phone already exits */
-        if (await memberRepo.AnyAsync(ct,newMemberWithUniquePhoneNumberSpecification))
+        if (await memberRepo.AnyAsync(newMemberWithUniquePhoneNumberSpecification,ct))
             return Result.Failure(MemberBusinessErrors.MemberPhoneNumberAlreadyExists);
 
         var member = _mapper.Map<Member>(memberToBeCreatedDTO);
@@ -102,7 +103,7 @@ public sealed class MemberService : IMemberService
     {
         var memberRepo = _unitOfWork.GetGenericRepository<Member>();
 
-        var memberToBeEdited = await memberRepo.GetByIdAsync(id, ct);
+        var memberToBeEdited = await memberRepo.GetByIdAsync(id, ct: ct);
 
         if (memberToBeEdited is null)
             return Result<MemberToBeEditedDTO>.Failure(MemberBusinessErrors.MemberNotEdited);
@@ -117,14 +118,14 @@ public sealed class MemberService : IMemberService
         var editMemberWithUniquePhoneNumberSpecification = new EditMemberWithUniquePhoneNumberSpecification(id, memberToBeEditedDTO.Phone);
 
         /* Check if passed Email already exits */
-        if (await memberRepo.AnyAsync(ct, editMemberWithUniqueEmailSpecification))
+        if (await memberRepo.AnyAsync(editMemberWithUniqueEmailSpecification, ct))
             return Result.Failure(MemberBusinessErrors.MemberEmailAlreadyExists);
 
         /* Check if passed Phone already exits */
-        if (await memberRepo.AnyAsync(ct, editMemberWithUniquePhoneNumberSpecification))
+        if (await memberRepo.AnyAsync(editMemberWithUniquePhoneNumberSpecification, ct))
             return Result.Failure(MemberBusinessErrors.MemberPhoneNumberAlreadyExists);
 
-        var memberToBeEdited = await memberRepo.GetByIdAsync(id,ct);
+        var memberToBeEdited = await memberRepo.GetByIdAsync(id,ct: ct);
 
         if(memberToBeEdited is null)
             return Result.Failure(MemberBusinessErrors.MemberToBeEditedNotFound);
@@ -145,7 +146,7 @@ public sealed class MemberService : IMemberService
     {
         var memberRepo = _unitOfWork.GetGenericRepository<Member>();
 
-        var memberToBeDeleted = await memberRepo.GetByIdAsync(id, ct);
+        var memberToBeDeleted = await memberRepo.GetByIdAsync(id, ct: ct);
 
         if (memberToBeDeleted is null)
             return Result.Failure(MemberBusinessErrors.MemberToBeDeletedNotFound);
@@ -153,12 +154,19 @@ public sealed class MemberService : IMemberService
         var bookingRepo = _unitOfWork.GetGenericRepository<Booking>();
         var memberActiveCurrentOrFutureBookingsSpecification = new MemberActiveCurrentOrFutureBookingsSpecification(id);
 
-        var memberHasActiveCurrentOrFutureBookings = await bookingRepo.AnyAsync(ct,memberActiveCurrentOrFutureBookingsSpecification);
+        var memberHasActiveCurrentOrFutureBookings = await bookingRepo.AnyAsync(memberActiveCurrentOrFutureBookingsSpecification,ct);
 
         if (memberHasActiveCurrentOrFutureBookings)
             return Result.Failure(MemberBusinessErrors.MemberWithActiveCurrentOrFutureBookingsCannotBeDeleted);
 
         memberRepo.SoftDelete(memberToBeDeleted);
+
+        var healthRecordRepo = _unitOfWork.GetGenericRepository<HealthRecord>();
+        var healthRecordOfMemberSpecification = new HealthRecordOfMemberSpecification(id);
+        var memberToBeDeletedHealthRecord = await healthRecordRepo.FirstOrDefaultAsync(healthRecordOfMemberSpecification, ct: ct);
+
+        if (memberToBeDeletedHealthRecord is not null)
+            healthRecordRepo.SoftDelete(memberToBeDeletedHealthRecord);
 
         var numOfRowsAffected = await _unitOfWork.SaveChangesAsync(ct);
 

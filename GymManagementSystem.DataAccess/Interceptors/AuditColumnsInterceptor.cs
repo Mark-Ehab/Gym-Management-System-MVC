@@ -34,10 +34,10 @@ public sealed class AuditColumnsInterceptor : SaveChangesInterceptor
             switch (entry.State)
             { 
                 case EntityState.Added:
-                    entry.Property(nameof(BaseEntity.CreatedAt)).CurrentValue = DateTime.UtcNow;
+                    entry.Property(nameof(BaseEntity.CreatedAt)).CurrentValue = DateTime.Now;
                     break;
                 case EntityState.Modified:
-                    entry.Property(nameof(BaseEntity.ModifiedAt)).CurrentValue = DateTime.UtcNow;
+                    entry.Property(nameof(BaseEntity.ModifiedAt)).CurrentValue = DateTime.Now;
                     break;
             }
         }

@@ -31,9 +31,9 @@ public sealed class TrainerService : ITrainerService
     {
         var trainerRepo = _unitOfWork.GetGenericRepository<Trainer>();
 
-        var allTrainers = await trainerRepo.GetAllAsync(ct);
+        var allTrainers = await trainerRepo.GetAllAsync(ct: ct);
 
-        if (allTrainers is null)
+        if (allTrainers is null || allTrainers.Count == 0)
             return [];
 
         return _mapper.Map<IEnumerable<AllTrainersDTO>>(allTrainers);
@@ -43,7 +43,7 @@ public sealed class TrainerService : ITrainerService
     {
         var trainerRepo = _unitOfWork.GetGenericRepository<Trainer>();
 
-        var trainer = await trainerRepo.GetByIdAsync(id, ct);
+        var trainer = await trainerRepo.GetByIdAsync(id, ct: ct);
 
         if (trainer is null)
             return Result<TrainerDetailsDTO>.Failure(TrainerBusinessErrors.TrainerDetailsNotFound);
@@ -58,11 +58,11 @@ public sealed class TrainerService : ITrainerService
         var newTrainerWithUniquePhoneNumberSpecification = new NewTrainerWithUniquePhoneNumberSpecification(trainerToBeCreatedDTO.Phone);
 
         /* Check if entered email already exists on the system */
-        if (await trainerRepo.AnyAsync(ct,newTrainerWithUniqueEmailSpecification))
+        if (await trainerRepo.AnyAsync(newTrainerWithUniqueEmailSpecification,ct))
             return Result.Failure(TrainerBusinessErrors.TrainerEmailAlreadyExists);
 
         /* Check if entered phone already exists on the system */
-        if (await trainerRepo.AnyAsync(ct, newTrainerWithUniquePhoneNumberSpecification))
+        if (await trainerRepo.AnyAsync(newTrainerWithUniquePhoneNumberSpecification, ct))
             return Result.Failure(TrainerBusinessErrors.TrainerPhoneNumberAlreadyExists);
 
         var trainerToBeAdded = _mapper.Map<Trainer>(trainerToBeCreatedDTO);
@@ -81,7 +81,7 @@ public sealed class TrainerService : ITrainerService
     {
         var trainerRepo = _unitOfWork.GetGenericRepository<Trainer>();
 
-        var trainerToBeEdited = await trainerRepo.GetByIdAsync(id, ct);
+        var trainerToBeEdited = await trainerRepo.GetByIdAsync(id, ct: ct);
 
         if (trainerToBeEdited is null)
             return Result<TrainerToBeEditedDTO>.Failure(TrainerBusinessErrors.TrainerToBeEditedNotFound);
@@ -96,14 +96,14 @@ public sealed class TrainerService : ITrainerService
         var editTrainerWithUniquePhoneNumberSpecification = new EditTrainerWithUniquePhoneNumberSpecification(id,trainerToBeEditedDTO.Phone);
 
         /* Check if email already exists on the system */
-        if (await trainerRepo.AnyAsync(ct, editTrainerWithUniqueEmailSpecification))
+        if (await trainerRepo.AnyAsync(editTrainerWithUniqueEmailSpecification, ct))
             return Result.Failure(TrainerBusinessErrors.TrainerEmailAlreadyExists);
 
         /* Check if phone already exists on the system */
-        if (await trainerRepo.AnyAsync(ct, editTrainerWithUniquePhoneNumberSpecification))
+        if (await trainerRepo.AnyAsync(editTrainerWithUniquePhoneNumberSpecification, ct))
             return Result.Failure(TrainerBusinessErrors.TrainerPhoneNumberAlreadyExists);
 
-        var trainerToBeEdited = await trainerRepo.GetByIdAsync(id, ct);
+        var trainerToBeEdited = await trainerRepo.GetByIdAsync(id, ct: ct);
 
         if (trainerToBeEdited is null)
             return Result.Failure(TrainerBusinessErrors.TrainerToBeEditedNotFound);
@@ -124,7 +124,7 @@ public sealed class TrainerService : ITrainerService
     {
         var trainerRepo = _unitOfWork.GetGenericRepository<Trainer>();
 
-        var trainerToBeDeleted = await trainerRepo.GetByIdAsync(id, ct);
+        var trainerToBeDeleted = await trainerRepo.GetByIdAsync(id, ct: ct);
 
         if (trainerToBeDeleted is null)
             return Result.Failure(TrainerBusinessErrors.TrainerToBeDeletedNotFound);
@@ -132,7 +132,7 @@ public sealed class TrainerService : ITrainerService
         var sessionRepo = _unitOfWork.GetGenericRepository<Session>();
         var trainerHasScheduledSessionsSpecification = new TrainerHasScheduledSessionsSpecification(id);
 
-        var trainerHasScheduledSessions = await sessionRepo.AnyAsync(ct, trainerHasScheduledSessionsSpecification);
+        var trainerHasScheduledSessions = await sessionRepo.AnyAsync(trainerHasScheduledSessionsSpecification, ct);
 
         if (trainerHasScheduledSessions)
             return Result.Failure(TrainerBusinessErrors.TrainerWithScheduledSessionsCannotBeDeleted);

@@ -13,5 +13,6 @@ public static class Seeder
         var memberIds = await MemberSeeder.SeedMember(context);
         await HealthRecordSeeder.SeedHealthRecord(context, memberIds);
         await TrainerSeeder.SeedTrainer(context);
+        await CategorySeeder.SeedCategory(context);
     }
 }

@@ -13,11 +13,14 @@ public sealed class UnitOfWork : IUnitOfWork
 {
     private readonly GymDbContext _gymDbContext;
     private readonly Dictionary<string, object> _repositories = []; 
+    public ISessionRepository SessionRepository { get; }
 
-    public UnitOfWork(GymDbContext gymDbContext)
+    public UnitOfWork(GymDbContext gymDbContext, ISessionRepository sessionRepository)
     {
         _gymDbContext = gymDbContext;
+        SessionRepository = sessionRepository;
     }
+
     public IGenericRepository<TEntity> GetGenericRepository<TEntity>() where TEntity : BaseEntity, new()
     {
         var repositoryKey = typeof(TEntity).Name;

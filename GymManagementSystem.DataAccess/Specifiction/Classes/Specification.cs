@@ -20,7 +20,7 @@ public abstract class Specification<TEntity> : ISpecificaion<TEntity> where TEnt
     public int Skip { get; set;}
 
     public bool IsPaginationEnabled { get; set;}
-    protected Specification(Expression<Func<TEntity, bool>>? criteria)
+    protected Specification(Expression<Func<TEntity, bool>>? criteria = null)
     {
         Criteria = criteria;
     }

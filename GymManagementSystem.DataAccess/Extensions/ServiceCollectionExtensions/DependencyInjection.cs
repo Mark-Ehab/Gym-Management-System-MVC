@@ -20,6 +20,9 @@ public static class DependencyInjection
         // Register Unit of Work to DI Container
         services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
 
+        // Register Session Repository to DI Container
+        services.AddScoped(typeof(ISessionRepository), typeof(SessionRepository));
+
         // Register any instance from GenericRepository<> and implementing IGenericRepository<> to DI Container
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 

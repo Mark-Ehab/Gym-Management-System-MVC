@@ -36,7 +36,7 @@ public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
                 continue;
             entry.State = EntityState.Modified;
             entity.IsDeleted = true;
-            entity.DeletedAt = DateTime.UtcNow;
+            entity.DeletedAt = DateTime.Now;
 
             foreach(var ReferenceEntry in entry.References)
             {

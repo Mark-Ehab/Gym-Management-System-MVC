@@ -354,7 +354,7 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                         .HasColumnType("tinyint")
                         .HasColumnOrder(3);
 
-                    b.Property<Guid>("CateogryId")
+                    b.Property<Guid>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -390,7 +390,7 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CateogryId");
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("TrainerId");
 
@@ -580,7 +580,7 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                 {
                     b.HasOne("GymManagementSystem.DataAccess.Models.Category", "Category")
                         .WithMany("Sessions")
-                        .HasForeignKey("CateogryId")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

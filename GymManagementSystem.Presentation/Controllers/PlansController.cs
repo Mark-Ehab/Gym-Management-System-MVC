@@ -59,7 +59,7 @@ public sealed class PlansController : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id, CancellationToken ct)
     {
-        var planTobeEditedDTOResult = await _planService.GetPlanToBeEditedAsync(id);
+        var planTobeEditedDTOResult = await _planService.GetPlanToBeEditedAsync(id,ct);
 
         if (planTobeEditedDTOResult.IsFailure)
         {
@@ -99,9 +99,9 @@ public sealed class PlansController : Controller
     // POST BaseURL/Plans/Activate/{id}
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Activate(Guid id)
+    public async Task<IActionResult> Activate(Guid id, CancellationToken ct)
     {
-        var result = await _planService.ChangePlanStatusAsync(id);
+        var result = await _planService.ChangePlanStatusAsync(id,ct);
 
         if (result.IsSuccessful)
         {

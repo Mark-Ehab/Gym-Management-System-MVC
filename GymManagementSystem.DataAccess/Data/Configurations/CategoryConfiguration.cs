@@ -18,7 +18,7 @@ public sealed class CategoryConfiguration : IEntityTypeConfiguration<Category>
 
         builder.HasMany(c => c.Sessions)
             .WithOne(s => s.Category)
-            .HasForeignKey(s => s.CateogryId)
+            .HasForeignKey(s => s.CategoryId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

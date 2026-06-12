@@ -35,7 +35,7 @@ public sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
 
         builder.HasOne(s => s.Category)
             .WithMany(c => c.Sessions)
-            .HasForeignKey(s => s.CateogryId)
+            .HasForeignKey(s => s.CategoryId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(s => s.Bookings)

@@ -29,9 +29,9 @@ public sealed class PlanService : IPlanService
     {
         var planRepo = _unitOfWork.GetGenericRepository<Plan>();
 
-        var allPlans = await planRepo.GetAllAsync(ct);
+        var allPlans = await planRepo.GetAllAsync(ct: ct);
 
-        if (allPlans is null)
+        if (allPlans is null || allPlans.Count == 0)
             return [];
 
         return _mapper.Map<IEnumerable<AllPlansDTO>>(allPlans);
@@ -40,7 +40,7 @@ public sealed class PlanService : IPlanService
     {
         var planRepo = _unitOfWork.GetGenericRepository<Plan>();
 
-        var plan = await planRepo.GetByIdAsync(id, ct);
+        var plan = await planRepo.GetByIdAsync(id, ct: ct);
 
         if (plan is null)
             return Result<PlanDetailsDTO>.Failure(PlanBusinessErrors.PlanDetailsNotFound);
@@ -52,7 +52,7 @@ public sealed class PlanService : IPlanService
     {
         var planRepo = _unitOfWork.GetGenericRepository<Plan>();
 
-        var planToBeEdited = await planRepo.GetByIdAsync(id, ct);
+        var planToBeEdited = await planRepo.GetByIdAsync(id, ct: ct);
 
         if (planToBeEdited is null)
             return Result<PlanToBeEditedDTO>.Failure(PlanBusinessErrors.PlanToBeEditedNotFound);
@@ -60,7 +60,7 @@ public sealed class PlanService : IPlanService
         var membershipRepo = _unitOfWork.GetGenericRepository<Membership>();
         var planHasActiveMembershipsSpecification = new PlanHasActiveMembershipsSpecification(id);
 
-        var planHasActiveMemberships = await membershipRepo.AnyAsync(ct,planHasActiveMembershipsSpecification);
+        var planHasActiveMemberships = await membershipRepo.AnyAsync(planHasActiveMembershipsSpecification, ct);
 
         if (planHasActiveMemberships)
             return Result<PlanToBeEditedDTO>.Failure(PlanBusinessErrors.PlanToBeEditedHasActiveMemberships);
@@ -72,7 +72,7 @@ public sealed class PlanService : IPlanService
     {
         var planRepo = _unitOfWork.GetGenericRepository<Plan>();
 
-        var planToBeUpdated = await planRepo.GetByIdAsync(id, ct);
+        var planToBeUpdated = await planRepo.GetByIdAsync(id, ct: ct);
 
         if (planToBeUpdated is null)
             return Result.Failure(PlanBusinessErrors.PlanToBeEditedNotFound);
@@ -80,7 +80,7 @@ public sealed class PlanService : IPlanService
         var membershipRepo = _unitOfWork.GetGenericRepository<Membership>();
         var planHasActiveMembershipsSpecification = new PlanHasActiveMembershipsSpecification(id);
 
-        var planHasActiveMemberships = await membershipRepo.AnyAsync(ct, planHasActiveMembershipsSpecification);
+        var planHasActiveMemberships = await membershipRepo.AnyAsync(planHasActiveMembershipsSpecification, ct);
 
         if (planHasActiveMemberships)
             return Result.Failure(PlanBusinessErrors.PlanToBeEditedHasActiveMemberships);
@@ -101,7 +101,7 @@ public sealed class PlanService : IPlanService
     {
         var planRepo = _unitOfWork.GetGenericRepository<Plan>();
 
-        var planWithStatusToBeChanged = await planRepo.GetByIdAsync(id, ct);
+        var planWithStatusToBeChanged = await planRepo.GetByIdAsync(id, ct: ct);
 
         if (planWithStatusToBeChanged is null)
             return Result.Failure(PlanBusinessErrors.PlanWithStatusToBeChangedNotFound);
@@ -110,7 +110,7 @@ public sealed class PlanService : IPlanService
 
         var planHasActiveMembershipsSpecification = new PlanHasActiveMembershipsSpecification(id);
 
-        var planHasActiveMemberships = await membershipRepo.AnyAsync(ct, planHasActiveMembershipsSpecification);
+        var planHasActiveMemberships = await membershipRepo.AnyAsync(planHasActiveMembershipsSpecification, ct);
 
         if (planHasActiveMemberships && planWithStatusToBeChanged.IsActive == true)
             return Result.Failure(PlanBusinessErrors.PlanWithActiveMembershipsCannotBeDeactivated);

@@ -12,24 +12,24 @@ public sealed class Session : BaseEntity
     public DateTime EndDate { get; set; }
     public Guid TrainerId { get; set; }
     public Trainer Trainer { get; set; } = default!;
-    public Guid CateogryId { get; set; }
+    public Guid CategoryId { get; set; }
     public Category Category { get; set; } = default!;
     public ICollection<Booking> Bookings { get; set; } = [];
     public string Status 
     {
         get 
         {
-            if(StartDate > DateTime.UtcNow)
+            if(StartDate > DateTime.Now)
             {
                 return "Upcoming";
             }
 
-            if(EndDate > DateTime.UtcNow)
+            if(EndDate > DateTime.Now)
             {
-                return "Completed";
+                return "Ongoing";
             }
 
-            return "Ongoing";
+            return "Completed";
         }
     }
 }

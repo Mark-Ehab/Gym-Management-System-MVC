@@ -10,4 +10,5 @@ public interface IUnitOfWork
 {
     IGenericRepository<TEntity> GetGenericRepository<TEntity>() where TEntity : BaseEntity, new();
     Task<int> SaveChangesAsync(CancellationToken ct = default);
+    ISessionRepository SessionRepository { get; }
 }
