@@ -1,4 +1,8 @@
+using AutoMapper;
+using GymManagementSystem.BusinessLogic.Contracts.Services;
+using GymManagementSystem.BusinessLogic.DTOs.AnalyticsDTOs;
 using GymManagementSystem.Presentation.Models;
+using GymManagementSystem.Presentation.ViewModels.AnalyticsViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -6,9 +10,19 @@ namespace GymManagementSystem.Presentation.Controllers;
 
 public class HomeController : Controller
 {
-    public IActionResult Index()
+    private readonly IAnalyticsService _analyticsService;
+    private readonly IMapper _mapper;
+
+    public HomeController(IAnalyticsService analyticsService, IMapper mapper)
     {
-        return View();
+        _analyticsService = analyticsService;
+        _mapper = mapper;
+    }
+    public async Task<IActionResult> Index(CancellationToken ct)
+    {
+        var analyticsDTOResult = await _analyticsService.GetHomeAnalyticsAsync(ct);
+
+        return View(_mapper.Map<HomeAnalyticsViewModel>(analyticsDTOResult.Value));
     }
 
     public IActionResult Privacy()

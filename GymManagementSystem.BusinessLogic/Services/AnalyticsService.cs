@@ -1,0 +1,42 @@
+﻿using GymManagementSystem.BusinessLogic.BusinessSpecifictions.MembershipSpecifications;
+using GymManagementSystem.BusinessLogic.BusinessSpecifictions.SessionSpecifications;
+using GymManagementSystem.BusinessLogic.Contracts.Services;
+using GymManagementSystem.BusinessLogic.DTOs.AnalyticsDTOs;
+using GymManagementSystem.BusinessLogic.Results;
+using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.UoW.Contract;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace GymManagementSystem.BusinessLogic.Services;
+
+public sealed class AnalyticsService : IAnalyticsService
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public AnalyticsService(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+    public async Task<Result<HomeAnalyticsDTO>> GetHomeAnalyticsAsync(CancellationToken ct)
+    {
+        var totalMembers = await _unitOfWork.GetGenericRepository<Member>().CountAsync(ct: ct);
+        var activeMembers = await _unitOfWork.GetGenericRepository<Membership>().CountAsync(new ActiveMembershipsSpecification(),ct);
+        var totalTrainers = await _unitOfWork.GetGenericRepository<Trainer>().CountAsync(ct: ct);
+        var upcomingSessions = await _unitOfWork.GetGenericRepository<Session>().CountAsync(new UpcomingSessionsSpecification(), ct: ct);
+        var ongoingSessions = await _unitOfWork.GetGenericRepository<Session>().CountAsync(new OngoingSessionsSpecification(), ct: ct);
+        var completedSessions = await _unitOfWork.GetGenericRepository<Session>().CountAsync(new CompletedSessionsSpecification(),ct: ct);
+
+        return Result<HomeAnalyticsDTO>.Success(new()
+        {
+            TotalMembers = totalMembers,
+            ActiveMembers = activeMembers,
+            Trainers = totalTrainers,
+            UpcomingSessions = upcomingSessions,
+            CompletedSessions = completedSessions,
+            OngoingSessions = ongoingSessions
+        });
+    }
+
+}

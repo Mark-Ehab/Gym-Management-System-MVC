@@ -10,7 +10,7 @@ public static class DependencyInjection
         services.AddControllersWithViews();
 
         // Resgister Mapping Profiles for Presentation Layer
-        services.AddAutoMapper(config => config.AddProfiles([new MemberMappingProfile(),new TrainerMappingProfile(),new PlanMappingProfile(), new SessionMappingProfile()]));
+        services.AddAutoMapper(config => config.AddProfiles([new MemberMappingProfile(),new TrainerMappingProfile(),new PlanMappingProfile(), new SessionMappingProfile(), new AnalyticsMappingProfile()]));
 
         return services;
     }

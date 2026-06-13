@@ -12,6 +12,6 @@ public sealed class Membership : BaseEntity
     public Plan Plan { get; set; } = default!;
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate => StartDate.AddDays(Plan.DurationDays);
-    public string Status => EndDate < DateOnly.FromDateTime(DateTime.UtcNow) ? "Inactive" : "Active";
-    public bool IsActive => EndDate > DateOnly.FromDateTime(DateTime.UtcNow);
+    public string Status => EndDate < DateOnly.FromDateTime(DateTime.Now) ? "Inactive" : "Active";
+    public bool IsActive => EndDate > DateOnly.FromDateTime(DateTime.Now);
 }

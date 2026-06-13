@@ -14,6 +14,7 @@ public static class DependencyInjection
     public static IServiceCollection AddBusinessLogic(this IServiceCollection services)
     {
         // Register business logic services to the DI container.
+        services.AddScoped<IAnalyticsService, AnalyticsService>();
         services.AddScoped<IPlanService, PlanService>();
         services.AddScoped<IMemberService, MemberService>();
         services.AddScoped<ITrainerService, TrainerService>();
