@@ -11,7 +11,7 @@ namespace GymManagementSystem.BusinessLogic.Extensions.ServiceCollectionExtensio
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddBusinessLogic(this IServiceCollection services)
+    public static void AddBusinessLogic(this IServiceCollection services)
     {
         // Register business logic services to the DI container.
         services.AddScoped<IAnalyticsService, AnalyticsService>();
@@ -20,7 +20,5 @@ public static class DependencyInjection
         services.AddScoped<ITrainerService, TrainerService>();
         services.AddScoped<ISessionService, SessionService>();
         services.AddAutoMapper(config => config.AddProfiles([new MemberMappingProfile(),new TrainerMappingProfile(),new PlanMappingProfile(),new SessionMappingProfile()]));
-
-        return services;
     }
 }

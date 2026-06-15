@@ -4,14 +4,12 @@ namespace GymManagementSystem.Presentation.Extensions.ServiceCollectionExtension
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddPresentation(this IServiceCollection services)
+    public static void AddPresentation(this IServiceCollection services)
     {
         // Register controllers with views to the DI container.
         services.AddControllersWithViews();
 
         // Resgister Mapping Profiles for Presentation Layer
         services.AddAutoMapper(config => config.AddProfiles([new MemberMappingProfile(),new TrainerMappingProfile(),new PlanMappingProfile(), new SessionMappingProfile(), new AnalyticsMappingProfile()]));
-
-        return services;
     }
 }

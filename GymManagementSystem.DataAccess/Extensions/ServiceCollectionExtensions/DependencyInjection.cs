@@ -15,7 +15,7 @@ namespace GymManagementSystem.DataAccess.Extensions.ServiceCollectionExtensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddDataAccess(this IServiceCollection services, IConfiguration configuration)
+    public static void AddDataAccess(this IServiceCollection services, IConfiguration configuration)
     {
         // Register Unit of Work to DI Container
         services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
@@ -36,7 +36,5 @@ public static class DependencyInjection
         // Register instances of types SoftDeleteInterceptor and AuditColumnsInterceptor as singleton to DI container
         services.AddSingleton<SoftDeleteInterceptor>();
         services.AddSingleton<AuditColumnsInterceptor>();
-
-        return services;
     }
 }

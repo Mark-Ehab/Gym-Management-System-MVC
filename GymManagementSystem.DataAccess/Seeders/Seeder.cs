@@ -7,9 +7,9 @@ namespace GymManagementSystem.DataAccess.Seeders;
 
 public static class Seeder
 {
-    public async static Task SeedAllAsync(GymDbContext context)
+    public async static Task SeedAllAsync(GymDbContext context, string folderPath)
     {
-        await PlanSeeder.SeedPlan(context);
+        await PlanSeeder.SeedPlan(context, folderPath);
         var memberIds = await MemberSeeder.SeedMember(context);
         await HealthRecordSeeder.SeedHealthRecord(context, memberIds);
         await TrainerSeeder.SeedTrainer(context);

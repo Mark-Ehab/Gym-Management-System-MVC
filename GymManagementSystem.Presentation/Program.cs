@@ -8,9 +8,17 @@ using GymManagementSystem.DataAccess.Repositories.Classes;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
 using GymManagementSystem.DataAccess.Seeders;
 using GymManagementSystem.Presentation.Extensions.ServiceCollectionExtensions;
+using GymManagementSystem.Presentation.Extensions.WebApplicationExtensions;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog as default logger
+builder.Host.UseSerilog((context, loggerConfiguration) =>
+{
+    loggerConfiguration.ReadFrom.Configuration(context.Configuration);
+});
 
 // Register Presentation layer services to the DI container.
 builder.Services.AddPresentation();
@@ -23,11 +31,8 @@ builder.Services.AddDataAccess(builder.Configuration);
 
 var app = builder.Build();
 
-/* Seed Database on Startup */
-using var scope = app.Services.CreateScope();
-var scopedGymDbContext = scope.ServiceProvider.GetRequiredService<GymDbContext>();
-await scopedGymDbContext!.Database.MigrateAsync();
-await Seeder.SeedAllAsync(scopedGymDbContext);
+// Migrate and seed database
+await app.MigrateAndSeedDatabase();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -41,6 +46,8 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseSerilogRequestLogging();
 
 app.MapStaticAssets();
 
