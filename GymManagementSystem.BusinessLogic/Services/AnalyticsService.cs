@@ -5,6 +5,7 @@ using GymManagementSystem.BusinessLogic.DTOs.AnalyticsDTOs;
 using GymManagementSystem.BusinessLogic.Results;
 using GymManagementSystem.DataAccess.Models;
 using GymManagementSystem.DataAccess.UoW.Contract;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,10 +15,12 @@ namespace GymManagementSystem.BusinessLogic.Services;
 public sealed class AnalyticsService : IAnalyticsService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<AnalyticsService> _logger;
 
-    public AnalyticsService(IUnitOfWork unitOfWork)
+    public AnalyticsService(IUnitOfWork unitOfWork, ILogger<AnalyticsService> logger)
     {
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
     public async Task<Result<HomeAnalyticsDTO>> GetHomeAnalyticsAsync(CancellationToken ct)
     {
@@ -28,6 +31,7 @@ public sealed class AnalyticsService : IAnalyticsService
         var ongoingSessions = await _unitOfWork.GetGenericRepository<Session>().CountAsync(new OngoingSessionsSpecification(), ct: ct);
         var completedSessions = await _unitOfWork.GetGenericRepository<Session>().CountAsync(new CompletedSessionsSpecification(),ct: ct);
 
+        _logger.LogInformation("Dashboard analytics are retrieved successfully");
         return Result<HomeAnalyticsDTO>.Success(new()
         {
             TotalMembers = totalMembers,

@@ -1,4 +1,5 @@
 ﻿using GymManagementSystem.Presentation.MappingProfiles;
+using GymManagementSystem.Presentation.Middlewares;
 
 namespace GymManagementSystem.Presentation.Extensions.ServiceCollectionExtensions;
 
@@ -8,6 +9,9 @@ public static class DependencyInjection
     {
         // Register controllers with views to the DI container.
         services.AddControllersWithViews();
+
+        // Register Global Error Handling middleware to the DI container.
+        services.AddTransient<IMiddleware, GlobalExceptionHandler>();
 
         // Resgister Mapping Profiles for Presentation Layer
         services.AddAutoMapper(config => config.AddProfiles([new MemberMappingProfile(),new TrainerMappingProfile(),new PlanMappingProfile(), new SessionMappingProfile(), new AnalyticsMappingProfile()]));

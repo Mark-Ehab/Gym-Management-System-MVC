@@ -9,7 +9,7 @@ namespace GymManagementSystem.BusinessLogic.BusinessSpecifictions.BookingSpecifi
 public sealed class BookingsForSessionExistSpecification : Specification<Booking>
 {
     public BookingsForSessionExistSpecification(Guid sessionId)
-        :base(b => b.SessionId ==  sessionId)
+        :base(b => b.SessionId == sessionId)
     {
         
     }

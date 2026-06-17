@@ -9,51 +9,73 @@ using GymManagementSystem.DataAccess.Repositories.Contracts;
 using GymManagementSystem.DataAccess.Seeders;
 using GymManagementSystem.Presentation.Extensions.ServiceCollectionExtensions;
 using GymManagementSystem.Presentation.Extensions.WebApplicationExtensions;
+using GymManagementSystem.Presentation.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.Seq("http://localhost:5341")
+    .CreateBootstrapLogger();
 
-// Configure Serilog as default logger
-builder.Host.UseSerilog((context, loggerConfiguration) =>
+try 
 {
-    loggerConfiguration.ReadFrom.Configuration(context.Configuration);
-});
+    Log.Information("Gym Management system is starting ...");
 
-// Register Presentation layer services to the DI container.
-builder.Services.AddPresentation();
+    // Create Web Application builder
+    var builder = WebApplication.CreateBuilder(args);
 
-// Register Business Logic layer services to the DI container.
-builder.Services.AddBusinessLogic();
+    // Configure Serilog as default logger
+    builder.Host.UseSerilog((context, loggerConfiguration) =>
+    {
+        loggerConfiguration.ReadFrom.Configuration(context.Configuration);
+    });
 
-// Register Data Access layer services to the DI container.
-builder.Services.AddDataAccess(builder.Configuration);
+    // Register Presentation layer services to the DI container.
+    builder.Services.AddPresentation();
 
-var app = builder.Build();
+    // Register Business Logic layer services to the DI container.
+    builder.Services.AddBusinessLogic();
 
-// Migrate and seed database
-await app.MigrateAndSeedDatabase();
+    // Register Data Access layer services to the DI container.
+    builder.Services.AddDataAccess(builder.Configuration);
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    var app = builder.Build();
+
+    // Migrate and seed database
+    await app.MigrateAndSeedDatabase();
+
+    app.UseGlobalExceptionHandler();
+
+    // Configure the HTTP request pipeline.
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Home/Error");
+        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        app.UseHsts();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseRouting();
+
+    app.UseAuthorization();
+
+    app.UseSerilogRequestLogging();
+
+    app.MapStaticAssets();
+
+    app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}")
+        .WithStaticAssets();
+
+    app.Run();
 }
-
-app.UseHttpsRedirection();
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.UseSerilogRequestLogging();
-
-app.MapStaticAssets();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "The Application failed to start correctly!");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
