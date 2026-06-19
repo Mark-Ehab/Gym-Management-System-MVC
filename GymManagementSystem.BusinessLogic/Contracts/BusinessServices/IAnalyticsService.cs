@@ -1,10 +1,10 @@
-﻿using GymManagementSystem.BusinessLogic.DTOs.AnalyticsDTOs;
-using GymManagementSystem.BusinessLogic.Results;
+﻿using GymManagementSystem.BusinessLogic.Common;
+using GymManagementSystem.BusinessLogic.DTOs.AnalyticsDTOs;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GymManagementSystem.BusinessLogic.Contracts.Services;
+namespace GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 
 public interface IAnalyticsService
 {

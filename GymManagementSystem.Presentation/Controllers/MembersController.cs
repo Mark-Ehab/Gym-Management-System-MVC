@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using GymManagementSystem.BusinessLogic.Contracts.Services;
+using GymManagementSystem.BusinessLogic.Contracts.AttachmentService;
+using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.HealthRecordDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.MemberDTOs;
 using GymManagementSystem.DataAccess.Enums;
@@ -13,12 +14,16 @@ public sealed class MembersController : Controller
     /* Fields */
     private readonly IMemberService _memberService;
     private readonly IMapper _mapper;
+    private readonly IAttachmentService _attachmentService;
 
     /* Constructor */
-    public MembersController(IMemberService service,IMapper mapper)
+    public MembersController(IMemberService service,
+                             IMapper mapper,
+                             IAttachmentService attachmentService)
     {
         _memberService = service;
         _mapper = mapper;
+        _attachmentService = attachmentService;
     }
 
     /* Actions (Endpoints) */
@@ -52,6 +57,26 @@ public sealed class MembersController : Controller
         var memberDetailsViewModel = _mapper.Map<MemberDetailsViewModel>(memberDetailsDTOResult.Value);
 
         return View(memberDetailsViewModel);
+    }
+
+    // GET BaseURL/Members/ProfilePicture/{id}
+    [HttpGet]
+    public async Task<IActionResult> ProfilePicture(Guid id, CancellationToken ct)
+    {
+        var memberDetailsDTOResult = await _memberService.GetMemberDetailsAsync(id, ct);
+
+        if (memberDetailsDTOResult.IsFailure)
+        {
+            TempData["FailureAlert"] = memberDetailsDTOResult.Error!.Description;
+            return RedirectToAction(nameof(Index));
+        }
+
+        if(string.IsNullOrWhiteSpace(memberDetailsDTOResult.Value.Photo))
+            return RedirectToAction(nameof(Index));
+
+        var result = _attachmentService.GetFile(memberDetailsDTOResult.Value.Photo, "MemberImages");
+
+        return File(result.Value.Item1, result.Value.Item2);
     }
 
     // GET BaseURL/Members/HealthRecordDetails/{id}

@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using AutoMapper.Execution;
 using GymManagementSystem.BusinessLogic.BusinessSpecifictions.TrainerSpecifications;
-using GymManagementSystem.BusinessLogic.Contracts.Services;
+using GymManagementSystem.BusinessLogic.Common;
+using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.MemberDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.TrainerDTOs;
 using GymManagementSystem.BusinessLogic.Helpers.BusinessErrors;
-using GymManagementSystem.BusinessLogic.Results;
 using GymManagementSystem.DataAccess.Models;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
 using GymManagementSystem.DataAccess.UoW.Contract;
@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GymManagementSystem.BusinessLogic.Services;
+namespace GymManagementSystem.BusinessLogic.Services.BusinessServices;
 
 public sealed class TrainerService : ITrainerService
 {

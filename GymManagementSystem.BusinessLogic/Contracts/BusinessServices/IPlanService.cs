@@ -1,11 +1,11 @@
-﻿using GymManagementSystem.BusinessLogic.DTOs.PlanDTOs;
-using GymManagementSystem.BusinessLogic.Results;
+﻿using GymManagementSystem.BusinessLogic.Common;
+using GymManagementSystem.BusinessLogic.DTOs.PlanDTOs;
 using GymManagementSystem.DataAccess.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GymManagementSystem.BusinessLogic.Contracts.Services;
+namespace GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 
 public interface IPlanService
 {

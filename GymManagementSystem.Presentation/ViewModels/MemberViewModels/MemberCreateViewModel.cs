@@ -8,6 +8,9 @@ namespace GymManagementSystem.Presentation.ViewModels.MemberViewModels;
 
 public sealed class MemberCreateViewModel
 {
+    //[FileExtensions(Extensions = ".jpg,.jpeg,.png", ErrorMessage = "Allowed extensions are .jpg, .jpeg and .png")]
+    [Display(Name = "Profile Photo")]
+    public IFormFile? Photo { get; set; }
     [Required(ErrorMessage = "* Name is required !")]
     [StringLength(50,ErrorMessage ="* Name max length shall not exceed 50 characters !")]
     [Display(Name = "Name")]

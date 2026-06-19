@@ -4,6 +4,7 @@ namespace GymManagementSystem.Presentation.ViewModels.MemberViewModels;
 
 public sealed class MemberToBeEditedViewModel
 {
+    public IFormFile? PhotoFile { get; set; }
     public string? Photo { get; set; }
     public string? Name { get; set; }
     [Required(ErrorMessage = "* Email is required !")]

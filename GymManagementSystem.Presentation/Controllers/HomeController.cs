@@ -1,5 +1,5 @@
 using AutoMapper;
-using GymManagementSystem.BusinessLogic.Contracts.Services;
+using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.AnalyticsDTOs;
 using GymManagementSystem.Presentation.Models;
 using GymManagementSystem.Presentation.ViewModels.AnalyticsViewModels;

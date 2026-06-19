@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using GymManagementSystem.BusinessLogic.Contracts.Services;
+using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.TrainerDTOs;
-using GymManagementSystem.BusinessLogic.Results;
+using GymManagementSystem.BusinessLogic.Common;
 using GymManagementSystem.Presentation.ViewModels.TrainerViewModels;
 using Microsoft.AspNetCore.Mvc;
 

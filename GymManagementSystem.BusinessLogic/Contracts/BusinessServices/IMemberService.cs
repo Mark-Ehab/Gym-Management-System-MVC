@@ -1,12 +1,12 @@
 ﻿using GymManagementSystem.BusinessLogic.DTOs.HealthRecordDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.MemberDTOs;
-using GymManagementSystem.BusinessLogic.Results;
 using GymManagementSystem.BusinessLogic.DTOs.PlanDTOs;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using GymManagementSystem.BusinessLogic.Common;
 
-namespace GymManagementSystem.BusinessLogic.Contracts.Services;
+namespace GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 
 public interface IMemberService
 {

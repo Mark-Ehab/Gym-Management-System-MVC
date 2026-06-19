@@ -11,7 +11,7 @@ public static class DependencyInjection
         services.AddControllersWithViews();
 
         // Register Global Error Handling middleware to the DI container.
-        services.AddTransient<IMiddleware, GlobalExceptionHandler>();
+        services.AddTransient<GlobalExceptionHandler>();
 
         // Resgister Mapping Profiles for Presentation Layer
         services.AddAutoMapper(config => config.AddProfiles([new MemberMappingProfile(),new TrainerMappingProfile(),new PlanMappingProfile(), new SessionMappingProfile(), new AnalyticsMappingProfile()]));

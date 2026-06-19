@@ -37,7 +37,14 @@ public sealed class MemberMappingProfile : Profile
         CreateMap<Member, MemberToBeEditedDTO>()
             .ForMember(dest => dest.BuildingNumber, opts => opts.MapFrom(src => src.Address.BuildingNumber))
             .ForMember(dest => dest.Street, opts => opts.MapFrom(src => src.Address.Street))
-            .ForMember(dest => dest.City, opts => opts.MapFrom(src => src.Address.City));
+            .ForMember(dest => dest.City, opts => opts.MapFrom(src => src.Address.City))
+            .AfterMap((src,dest) =>
+            {
+                if(src.Photo is not null)
+                {
+                    dest.Photo = src.Photo;
+                }
+            });
 
         CreateMap<MemberToBeEditedDTO, Member>()
             .ForMember(dest => dest.Address, opts => opts.MapFrom(src => new Address()

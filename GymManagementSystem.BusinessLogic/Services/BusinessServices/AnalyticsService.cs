@@ -1,8 +1,8 @@
 ﻿using GymManagementSystem.BusinessLogic.BusinessSpecifictions.MembershipSpecifications;
 using GymManagementSystem.BusinessLogic.BusinessSpecifictions.SessionSpecifications;
-using GymManagementSystem.BusinessLogic.Contracts.Services;
+using GymManagementSystem.BusinessLogic.Common;
+using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.AnalyticsDTOs;
-using GymManagementSystem.BusinessLogic.Results;
 using GymManagementSystem.DataAccess.Models;
 using GymManagementSystem.DataAccess.UoW.Contract;
 using Microsoft.Extensions.Logging;
@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GymManagementSystem.BusinessLogic.Services;
+namespace GymManagementSystem.BusinessLogic.Services.BusinessServices;
 
 public sealed class AnalyticsService : IAnalyticsService
 {

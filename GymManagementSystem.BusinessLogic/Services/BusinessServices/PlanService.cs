@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
 using GymManagementSystem.BusinessLogic.BusinessSpecifictions.PlanSpecifications;
-using GymManagementSystem.BusinessLogic.Contracts.Services;
+using GymManagementSystem.BusinessLogic.Common;
+using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.PlanDTOs;
 using GymManagementSystem.BusinessLogic.Helpers.BusinessErrors;
-using GymManagementSystem.BusinessLogic.Results;
 using GymManagementSystem.DataAccess.Models;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
 using GymManagementSystem.DataAccess.UoW.Contract;
 using Microsoft.Extensions.Logging;
 using System.Numerics;
 
-namespace GymManagementSystem.BusinessLogic.Services;
+namespace GymManagementSystem.BusinessLogic.Services.BusinessServices;
 
 public sealed class PlanService : IPlanService
 {

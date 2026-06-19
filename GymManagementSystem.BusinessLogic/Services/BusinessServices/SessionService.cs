@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using GymManagementSystem.BusinessLogic.BusinessSpecifictions.BookingSpecifications;
 using GymManagementSystem.BusinessLogic.BusinessSpecifictions.SessionSpecifications;
-using GymManagementSystem.BusinessLogic.Contracts.Services;
+using GymManagementSystem.BusinessLogic.Common;
+using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.CategoryDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.SessionDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.TrainerDTOs;
 using GymManagementSystem.BusinessLogic.Helpers.BusinessErrors;
-using GymManagementSystem.BusinessLogic.Results;
 using GymManagementSystem.DataAccess.Enums;
 using GymManagementSystem.DataAccess.Models;
 using GymManagementSystem.DataAccess.UoW.Contract;
@@ -15,7 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GymManagementSystem.BusinessLogic.Services;
+namespace GymManagementSystem.BusinessLogic.Services.BusinessServices;
 
 public sealed class SessionService : ISessionService
 {

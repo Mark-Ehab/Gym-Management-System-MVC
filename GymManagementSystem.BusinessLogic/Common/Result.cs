@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace GymManagementSystem.BusinessLogic.Results;
+namespace GymManagementSystem.BusinessLogic.Common;
 
 public class Result
 {

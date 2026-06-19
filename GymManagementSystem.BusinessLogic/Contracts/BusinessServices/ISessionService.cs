@@ -1,13 +1,13 @@
-﻿using GymManagementSystem.BusinessLogic.DTOs.CategoryDTOs;
+﻿using GymManagementSystem.BusinessLogic.Common;
+using GymManagementSystem.BusinessLogic.DTOs.CategoryDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.SessionDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.TrainerDTOs;
-using GymManagementSystem.BusinessLogic.Results;
 using GymManagementSystem.DataAccess.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GymManagementSystem.BusinessLogic.Contracts.Services;
+namespace GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 
 public interface ISessionService
 {

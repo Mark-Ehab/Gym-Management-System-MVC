@@ -1,4 +1,3 @@
-using GymManagementSystem.BusinessLogic.Contracts.Services;
 using GymManagementSystem.BusinessLogic.Extensions.ServiceCollectionExtensions;
 using GymManagementSystem.BusinessLogic.Services;
 using GymManagementSystem.DataAccess.Data.Contexts;

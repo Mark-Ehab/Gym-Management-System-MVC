@@ -2,11 +2,12 @@
 using GymManagementSystem.BusinessLogic.BusinessSpecifictions;
 using GymManagementSystem.BusinessLogic.BusinessSpecifictions.HealthRecordSpecifications;
 using GymManagementSystem.BusinessLogic.BusinessSpecifictions.MemberSpecifications;
-using GymManagementSystem.BusinessLogic.Contracts.Services;
+using GymManagementSystem.BusinessLogic.Common;
+using GymManagementSystem.BusinessLogic.Contracts.AttachmentService;
+using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.HealthRecordDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.MemberDTOs;
 using GymManagementSystem.BusinessLogic.Helpers.BusinessErrors;
-using GymManagementSystem.BusinessLogic.Results;
 using GymManagementSystem.DataAccess.Enums;
 using GymManagementSystem.DataAccess.Models;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
@@ -18,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GymManagementSystem.BusinessLogic.Services;
+namespace GymManagementSystem.BusinessLogic.Services.BusinessServices;
 
 public sealed class MemberService : IMemberService
 {
@@ -26,13 +27,18 @@ public sealed class MemberService : IMemberService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ILogger<MemberService> _logger;
+    private readonly IAttachmentService _attachmentService;
 
     /* Constructor */
-    public MemberService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<MemberService> logger)
+    public MemberService(IUnitOfWork unitOfWork,
+                         IMapper mapper,
+                         ILogger<MemberService> logger,
+                         IAttachmentService attachmentService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _logger = logger;
+        _attachmentService = attachmentService;
     }
 
     /* Methods */
@@ -116,12 +122,28 @@ public sealed class MemberService : IMemberService
 
         var memberToBeCreated = _mapper.Map<Member>(memberToBeCreatedDTO);
 
+        /* Upload member profile picture if any */
+        if(memberToBeCreatedDTO.PhotoFile is not null)
+        {
+            var result = await _attachmentService.SaveFileAsync(memberToBeCreatedDTO.PhotoFile,"MemberImages",true,ct);
+
+            if (result.IsFailure)
+                return Result.Failure(result.Error!);
+
+            memberToBeCreated.Photo = result.Value;
+        }
+
         memberRepo.Add(memberToBeCreated);
 
         var numOfRowsAffected = await _unitOfWork.SaveChangesAsync(ct);
 
         if (numOfRowsAffected == 0)
         {
+            /* Delete member profile picture if any */
+            if (memberToBeCreated.Photo is not null)
+            {
+                _attachmentService.DeleteFile(memberToBeCreated.Photo, "MemberImages");
+            }
             _logger.LogError("Member {@Name} is not created due to an internal DB error", memberToBeCreatedDTO.Name);
             return Result.Failure(MemberBusinessErrors.MemberNotCreated);
         }
@@ -176,6 +198,20 @@ public sealed class MemberService : IMemberService
 
         _mapper.Map(memberToBeEditedDTO,memberToBeEdited);
 
+        /* Check if member profile picture is edited */
+        if(memberToBeEditedDTO.PhotoFile is not null)
+        {
+            if(memberToBeEdited.Photo is not null)
+                _attachmentService.DeleteFile(memberToBeEdited.Photo, "MemberImages");
+
+            var result = await _attachmentService.SaveFileAsync(memberToBeEditedDTO.PhotoFile, "MemberImages", true, ct);
+
+            if (result.IsFailure)
+                return Result.Failure(result.Error!);
+
+            memberToBeEdited.Photo = result.Value;
+        }
+
         memberRepo.Update(memberToBeEdited);
 
         var numOfRowsAffected = await _unitOfWork.SaveChangesAsync(ct);
@@ -229,6 +265,9 @@ public sealed class MemberService : IMemberService
             _logger.LogError("Member of Id {@Id} is not deleted due to an internal DB error", id);
             return Result.Failure(MemberBusinessErrors.MemberNotDeleted);
         }
+
+        if (memberToBeDeleted.Photo is not null)
+            _attachmentService.DeleteFile(memberToBeDeleted.Photo, "MemberImages");
 
         _logger.LogInformation("Member of Id {@Id} is deleted successfully", id);
         return Result.Success();
