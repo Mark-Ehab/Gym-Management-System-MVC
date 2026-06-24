@@ -42,9 +42,9 @@ try
     var app = builder.Build();
 
     // Migrate and seed database
-    await app.MigrateAndSeedDatabase();
+    await app.MigrateAndSeedDatabase(builder.Configuration);
 
-    app.UseGlobalExceptionHandler();
+    //app.UseGlobalExceptionHandler();
 
     // Configure the HTTP request pipeline.
     if (!app.Environment.IsDevelopment())
@@ -57,6 +57,7 @@ try
     app.UseHttpsRedirection();
     app.UseRouting();
 
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.UseSerilogRequestLogging();
@@ -65,7 +66,7 @@ try
 
     app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}")
+        pattern: "{controller=Account}/{action=Login}/{id?}")
         .WithStaticAssets();
 
     app.Run();

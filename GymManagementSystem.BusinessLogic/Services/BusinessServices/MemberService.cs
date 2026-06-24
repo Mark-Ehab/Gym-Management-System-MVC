@@ -9,7 +9,7 @@ using GymManagementSystem.BusinessLogic.DTOs.HealthRecordDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.MemberDTOs;
 using GymManagementSystem.BusinessLogic.Helpers.BusinessErrors;
 using GymManagementSystem.DataAccess.Enums;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
 using GymManagementSystem.DataAccess.UoW.Contract;
 using GymManagementSystem.DataAccess.ValueObjects;

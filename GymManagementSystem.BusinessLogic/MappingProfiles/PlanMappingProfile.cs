@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using GymManagementSystem.BusinessLogic.DTOs.PlanDTOs;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
 using System;
 using System.Collections.Generic;
 using System.Text;

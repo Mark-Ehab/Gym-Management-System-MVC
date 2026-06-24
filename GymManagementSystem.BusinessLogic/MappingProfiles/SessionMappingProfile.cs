@@ -2,7 +2,7 @@
 using GymManagementSystem.BusinessLogic.DTOs.CategoryDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.SessionDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.TrainerDTOs;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
 using System;
 using System.Collections.Generic;
 using System.Text;

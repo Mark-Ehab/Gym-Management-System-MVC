@@ -1,6 +1,6 @@
 ﻿using GymManagementSystem.DataAccess.Data.Contexts;
 using GymManagementSystem.DataAccess.Enums;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
 using GymManagementSystem.DataAccess.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,7 +11,7 @@ namespace GymManagementSystem.DataAccess.Seeders;
 
 public static class TrainerSeeder
 {
-    public async static Task SeedTrainer(GymDbContext context)
+    public async static Task SeedTrainerAsync(GymDbContext context)
     {
         var trainerDbSet = context.Trainers;
         if (await trainerDbSet.AnyAsync())

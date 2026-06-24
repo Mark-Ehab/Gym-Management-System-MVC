@@ -1,16 +1,18 @@
 ﻿using AutoMapper;
+using GymManagementSystem.BusinessLogic.Common;
 using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.CategoryDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.PlanDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.SessionDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.TrainerDTOs;
-using GymManagementSystem.BusinessLogic.Common;
 using GymManagementSystem.Presentation.ViewModels.SessionViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GymManagementSystem.Presentation.Controllers;
 
+[Authorize]
 public class SessionsController : Controller
 {
     /* Fields */

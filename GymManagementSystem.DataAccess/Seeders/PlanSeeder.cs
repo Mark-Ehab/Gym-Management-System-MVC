@@ -1,5 +1,5 @@
 ﻿using GymManagementSystem.DataAccess.Data.Contexts;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ namespace GymManagementSystem.DataAccess.Seeders;
 
 public static class PlanSeeder
 {
-    public async static Task SeedPlan(GymDbContext context, string folderPath)
+    public async static Task SeedPlanAsync(GymDbContext context, string folderPath)
     {
         var plansDbSet = context.Plans;
 

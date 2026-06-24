@@ -1,5 +1,8 @@
 ﻿using GymManagementSystem.DataAccess.Data.Configurations;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
+using GymManagementSystem.DataAccess.Models.IdentityModels;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,7 +12,7 @@ using System.Text;
 
 namespace GymManagementSystem.DataAccess.Data.Contexts;
 
-public sealed class GymDbContext : DbContext
+public sealed class GymDbContext : IdentityDbContext<ApplicationUser,IdentityRole<Guid>,Guid>
 {
     /* Constructor */
     public GymDbContext(DbContextOptions<GymDbContext> options) : base(options) { }
@@ -27,8 +30,11 @@ public sealed class GymDbContext : DbContext
     /* Methods */
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        /* Apply Identity Configurations */
+        base.OnModelCreating(modelBuilder);
+
         /* Apply all models configurations built through Fluent API */
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(GymDbContext).Assembly);
 
         var modelEntityTypes = modelBuilder.Model.GetEntityTypes();
         foreach (var modelEntityType in modelEntityTypes)
@@ -37,7 +43,7 @@ public sealed class GymDbContext : DbContext
             if (!typeof(BaseEntity).IsAssignableFrom(modelEntityType.ClrType))
                 continue;
 
-            /* Apply a query filter for all models that extends BaseEntity to retrieve only items that are not soft deleted */
+            /* Apply a query filter for all models that extends BaseEntity to retrieve only items that are not soft-deleted */
             var param = Expression.Parameter(modelEntityType.ClrType, "e");
             var body = Expression.Not(Expression.Property(param,nameof(BaseEntity.IsDeleted)));
             var lambdaExpression = Expression.Lambda(body, param);

@@ -6,9 +6,12 @@ using GymManagementSystem.BusinessLogic.DTOs.MemberDTOs;
 using GymManagementSystem.DataAccess.Enums;
 using GymManagementSystem.Presentation.ViewModels.HealthRecordViewModels;
 using GymManagementSystem.Presentation.ViewModels.MemberViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GymManagementSystem.Presentation.Controllers;
+
+[Authorize(Roles = "SuperAdmin")]
 public sealed class MembersController : Controller
 {
     /* Fields */

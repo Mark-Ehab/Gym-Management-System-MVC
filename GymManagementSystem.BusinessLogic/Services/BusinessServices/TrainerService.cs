@@ -6,7 +6,7 @@ using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.MemberDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.TrainerDTOs;
 using GymManagementSystem.BusinessLogic.Helpers.BusinessErrors;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
 using GymManagementSystem.DataAccess.UoW.Contract;
 using Microsoft.Extensions.Logging;

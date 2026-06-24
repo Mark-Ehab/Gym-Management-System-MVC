@@ -1,5 +1,5 @@
 ﻿using GymManagementSystem.DataAccess.Data.Contexts;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
 using GymManagementSystem.DataAccess.Repositories.Classes;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
 using GymManagementSystem.DataAccess.UoW.Contract;

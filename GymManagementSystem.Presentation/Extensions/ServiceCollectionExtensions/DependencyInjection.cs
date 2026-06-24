@@ -15,5 +15,12 @@ public static class DependencyInjection
 
         // Resgister Mapping Profiles for Presentation Layer
         services.AddAutoMapper(config => config.AddProfiles([new MemberMappingProfile(),new TrainerMappingProfile(),new PlanMappingProfile(), new SessionMappingProfile(), new AnalyticsMappingProfile()]));
+
+        // Configure Application Cookies
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.ExpireTimeSpan = TimeSpan.FromHours(10);
+            options.SlidingExpiration = true;
+        });
     }
 }

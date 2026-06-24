@@ -1,4 +1,4 @@
-﻿using GymManagementSystem.DataAccess.Models;
+﻿using GymManagementSystem.DataAccess.Models.BusinessModels;
 using GymManagementSystem.DataAccess.Specifiction.Classes;
 using Microsoft.EntityFrameworkCore;
 using System;

@@ -1,4 +1,4 @@
-﻿using GymManagementSystem.DataAccess.Models;
+﻿using GymManagementSystem.DataAccess.Models.BusinessModels;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;

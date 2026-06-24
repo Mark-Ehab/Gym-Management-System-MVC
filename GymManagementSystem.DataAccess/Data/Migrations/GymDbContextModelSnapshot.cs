@@ -17,12 +17,12 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.8")
+                .HasAnnotation("ProductVersion", "10.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Booking", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Booking", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -69,7 +69,7 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                     b.ToTable("Bookings");
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Category", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Category", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -102,7 +102,7 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.HealthRecord", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.HealthRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -163,7 +163,7 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                     b.ToTable("HealthRecords");
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Member", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Member", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -243,7 +243,7 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Membership", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Membership", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -285,7 +285,7 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                     b.ToTable("Memberships");
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Plan", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Plan", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -342,7 +342,7 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Session", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Session", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -402,7 +402,7 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Trainer", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Trainer", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -487,15 +487,216 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Booking", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.IdentityModels.ApplicationUser", b =>
                 {
-                    b.HasOne("GymManagementSystem.DataAccess.Models.Member", "Member")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Booking", b =>
+                {
+                    b.HasOne("GymManagementSystem.DataAccess.Models.BusinessModels.Member", "Member")
                         .WithMany("Bookings")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymManagementSystem.DataAccess.Models.Session", "Session")
+                    b.HasOne("GymManagementSystem.DataAccess.Models.BusinessModels.Session", "Session")
                         .WithMany("Bookings")
                         .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -506,18 +707,18 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                     b.Navigation("Session");
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.HealthRecord", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.HealthRecord", b =>
                 {
-                    b.HasOne("GymManagementSystem.DataAccess.Models.Member", "Member")
+                    b.HasOne("GymManagementSystem.DataAccess.Models.BusinessModels.Member", "Member")
                         .WithOne("HealthRecord")
-                        .HasForeignKey("GymManagementSystem.DataAccess.Models.HealthRecord", "MemberId")
+                        .HasForeignKey("GymManagementSystem.DataAccess.Models.BusinessModels.HealthRecord", "MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Member");
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Member", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Member", b =>
                 {
                     b.OwnsOne("GymManagementSystem.DataAccess.ValueObjects.Address", "Address", b1 =>
                         {
@@ -557,15 +758,15 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Membership", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Membership", b =>
                 {
-                    b.HasOne("GymManagementSystem.DataAccess.Models.Member", "Member")
+                    b.HasOne("GymManagementSystem.DataAccess.Models.BusinessModels.Member", "Member")
                         .WithMany("Memberships")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymManagementSystem.DataAccess.Models.Plan", "Plan")
+                    b.HasOne("GymManagementSystem.DataAccess.Models.BusinessModels.Plan", "Plan")
                         .WithMany("Memberships")
                         .HasForeignKey("PlanId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -576,15 +777,15 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                     b.Navigation("Plan");
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Session", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Session", b =>
                 {
-                    b.HasOne("GymManagementSystem.DataAccess.Models.Category", "Category")
+                    b.HasOne("GymManagementSystem.DataAccess.Models.BusinessModels.Category", "Category")
                         .WithMany("Sessions")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymManagementSystem.DataAccess.Models.Trainer", "Trainer")
+                    b.HasOne("GymManagementSystem.DataAccess.Models.BusinessModels.Trainer", "Trainer")
                         .WithMany("Sessions")
                         .HasForeignKey("TrainerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -595,7 +796,7 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                     b.Navigation("Trainer");
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Trainer", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Trainer", b =>
                 {
                     b.OwnsOne("GymManagementSystem.DataAccess.ValueObjects.Address", "Address", b1 =>
                         {
@@ -635,12 +836,63 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Category", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
+                {
+                    b.HasOne("GymManagementSystem.DataAccess.Models.IdentityModels.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
+                {
+                    b.HasOne("GymManagementSystem.DataAccess.Models.IdentityModels.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GymManagementSystem.DataAccess.Models.IdentityModels.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+                {
+                    b.HasOne("GymManagementSystem.DataAccess.Models.IdentityModels.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Category", b =>
                 {
                     b.Navigation("Sessions");
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Member", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Member", b =>
                 {
                     b.Navigation("Bookings");
 
@@ -650,17 +902,17 @@ namespace GymManagementSystem.DataAccess.Data.Migrations
                     b.Navigation("Memberships");
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Plan", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Plan", b =>
                 {
                     b.Navigation("Memberships");
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Session", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Session", b =>
                 {
                     b.Navigation("Bookings");
                 });
 
-            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.Trainer", b =>
+            modelBuilder.Entity("GymManagementSystem.DataAccess.Models.BusinessModels.Trainer", b =>
                 {
                     b.Navigation("Sessions");
                 });

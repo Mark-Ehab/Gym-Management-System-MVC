@@ -8,7 +8,7 @@ using GymManagementSystem.BusinessLogic.DTOs.SessionDTOs;
 using GymManagementSystem.BusinessLogic.DTOs.TrainerDTOs;
 using GymManagementSystem.BusinessLogic.Helpers.BusinessErrors;
 using GymManagementSystem.DataAccess.Enums;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
 using GymManagementSystem.DataAccess.UoW.Contract;
 using Microsoft.Extensions.Logging;
 using System;

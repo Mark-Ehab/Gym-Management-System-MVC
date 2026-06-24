@@ -3,6 +3,7 @@ using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.PlanDTOs;
 using GymManagementSystem.DataAccess.Models;
 using GymManagementSystem.Presentation.ViewModels.PlanViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ using System.Text;
 
 namespace GymManagementSystem.Presentation.Controllers;
 
+[Authorize]
 public sealed class PlansController : Controller
 {
     /* Fields */

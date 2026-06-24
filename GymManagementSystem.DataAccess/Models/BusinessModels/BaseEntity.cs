@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace GymManagementSystem.DataAccess.Models;
+namespace GymManagementSystem.DataAccess.Models.BusinessModels;
 
 public abstract class BaseEntity
 {

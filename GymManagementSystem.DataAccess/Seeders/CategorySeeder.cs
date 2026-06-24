@@ -1,5 +1,5 @@
 ﻿using GymManagementSystem.DataAccess.Data.Contexts;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ namespace GymManagementSystem.DataAccess.Seeders;
 
 public static class CategorySeeder
 {
-    public async static Task SeedCategory(GymDbContext context)
+    public async static Task SeedCategoryAsync(GymDbContext context)
     {
         var categoryDbSet = context.Categories;
 

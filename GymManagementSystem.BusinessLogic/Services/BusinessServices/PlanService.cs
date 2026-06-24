@@ -4,7 +4,7 @@ using GymManagementSystem.BusinessLogic.Common;
 using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.PlanDTOs;
 using GymManagementSystem.BusinessLogic.Helpers.BusinessErrors;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
 using GymManagementSystem.DataAccess.UoW.Contract;
 using Microsoft.Extensions.Logging;

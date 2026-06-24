@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
+using GymManagementSystem.BusinessLogic.Common;
 using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.TrainerDTOs;
-using GymManagementSystem.BusinessLogic.Common;
 using GymManagementSystem.Presentation.ViewModels.TrainerViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GymManagementSystem.Presentation.Controllers;
 
+[Authorize]
 public sealed class TrainersController : Controller
 {
     /* Fields */

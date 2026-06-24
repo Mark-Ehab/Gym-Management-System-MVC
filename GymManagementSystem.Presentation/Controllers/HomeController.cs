@@ -3,11 +3,13 @@ using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.AnalyticsDTOs;
 using GymManagementSystem.Presentation.Models;
 using GymManagementSystem.Presentation.ViewModels.AnalyticsViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace GymManagementSystem.Presentation.Controllers;
 
+[Authorize]
 public class HomeController : Controller
 {
     private readonly IAnalyticsService _analyticsService;

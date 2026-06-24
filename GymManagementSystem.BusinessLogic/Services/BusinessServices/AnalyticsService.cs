@@ -3,7 +3,7 @@ using GymManagementSystem.BusinessLogic.BusinessSpecifictions.SessionSpecificati
 using GymManagementSystem.BusinessLogic.Common;
 using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.AnalyticsDTOs;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
 using GymManagementSystem.DataAccess.UoW.Contract;
 using Microsoft.Extensions.Logging;
 using System;

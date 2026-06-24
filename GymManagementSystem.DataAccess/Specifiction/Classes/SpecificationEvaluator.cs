@@ -1,4 +1,4 @@
-﻿using GymManagementSystem.DataAccess.Models;
+﻿using GymManagementSystem.DataAccess.Models.BusinessModels;
 using GymManagementSystem.DataAccess.Specifiction.Contract;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
