@@ -47,6 +47,7 @@ public class AccountController : Controller
 
         if(user is null)
         {
+            _logger.LogError("No user with email {@Email} is found!", loginViewModel.Email);
             ModelState.AddModelError("InvalidLogin","User is not found !");
             return View(loginViewModel);
         }
@@ -55,15 +56,19 @@ public class AccountController : Controller
 
         if(!signInResult.Succeeded)
         {
+            _logger.LogWarning("{@User} login attempt didn't succeed !", user.FullName);
             ModelState.AddModelError("InvalidLogin", "Email or Password is invalid !");
             return View(loginViewModel);
         }
 
         if(signInResult.IsLockedOut)
         {
+            _logger.LogWarning("{@User} is locked out for 15 mins !", user.FullName);
             ModelState.AddModelError("InvalidLogin", "Please, re-try login after 15 mins !");
             return View(loginViewModel);
         }
+
+        _logger.LogInformation("{@User} logged in successfully !",user.FullName);
 
         if(!string.IsNullOrWhiteSpace(loginViewModel.ReturnUrl) && Url.IsLocalUrl(loginViewModel.ReturnUrl))
         {
@@ -79,6 +84,8 @@ public class AccountController : Controller
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
+
+        _logger.LogInformation("{@User} logged out successfully !", User.Identity?.Name);
 
         return RedirectToAction(nameof(Login));
     }
