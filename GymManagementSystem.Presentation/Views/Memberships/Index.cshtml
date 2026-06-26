@@ -13,17 +13,22 @@
     </div>
 </header>
 
-<div id="Alert" class="alert alert-success alert-dismissible fade show">
-    <i class="bi bi-check-circle-fill me-2"></i>
-    Success Message
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-
-<div id="Alert" class="alert alert-danger alert-dismissible fade show">
-    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-    Error Message
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
+@if(TempData["SuccessAlert"] is not null)
+{
+    <div id="Alert" class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        @TempData["SuccessAlert"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+else if (@TempData["FailureAlert"] is not null)
+{
+    <div id="Alert" class="alert alert-danger alert-dismissible fade show">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        @TempData["FailureAlert"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 
 <div class="card">
     <div class="card-body">
@@ -49,7 +54,7 @@
                             <td>@item.EndDateDisplay</td>
                             <td>
                                 <div class="d-flex gap-1">
-                                    <form method="post" href="membership/cancel" class="m-0">
+                                    <form method="post" asp-controller="Memberships" asp-action="Cancel" class="m-0">
                                         <input type="hidden" name="id" value="@item.MemberId" />
                                         <button type="submit" class="btn btn-sm btn-danger">
                                             <i class="fas fa-times"></i> Cancel
@@ -71,3 +76,8 @@
         }
     </div>
 </div>
+
+@section Scripts
+{
+    <partial name="_AlertScriptPartial" />
+}

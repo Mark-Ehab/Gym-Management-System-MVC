@@ -1,4 +1,5 @@
-﻿using GymManagementSystem.BusinessLogic.Contracts.AttachmentService;
+﻿using AutoMapper;
+using GymManagementSystem.BusinessLogic.Contracts.AttachmentService;
 using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.MappingProfiles;
 using GymManagementSystem.BusinessLogic.Services.AttachmentService;
@@ -23,6 +24,6 @@ public static class DependencyInjection
         services.AddScoped<IMemberService, MemberService>();
         services.AddScoped<ITrainerService, TrainerService>();
         services.AddScoped<ISessionService, SessionService>();
-        services.AddAutoMapper(config => config.AddProfiles([new MemberMappingProfile(),new TrainerMappingProfile(),new PlanMappingProfile(),new SessionMappingProfile()]));
+        services.AddAutoMapper(config => { }, typeof(DependencyInjection).Assembly);
     }
 }

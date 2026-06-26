@@ -6,10 +6,15 @@ using System.Text;
 
 namespace GymManagementSystem.BusinessLogic.BusinessSpecifictions.PlanSpecifications;
 
-public sealed class PlanHasActiveMembershipsSpecification : Specification<Membership>
+public sealed class ActivePlansSpecification : Specification<Plan>
 {
-    public PlanHasActiveMembershipsSpecification(Guid planId)
-        :base(ms => ms.PlanId == planId && ms.StartDate.AddDays(ms.Plan.DurationDays) > DateOnly.FromDateTime(DateTime.UtcNow))
+    public ActivePlansSpecification()
+        :base(p => p.IsActive)
+    {
+        
+    }
+    public ActivePlansSpecification(Guid planId)
+        :base(p => p.Id == planId && p.IsActive)
     {
         
     }

@@ -21,7 +21,7 @@ public sealed class MemberMappingProfile : Profile
             {
                 dest.PlanName = src.Memberships.FirstOrDefault()?.Plan.Name;
                 dest.MembershipStartDate = src.Memberships.FirstOrDefault()?.StartDate;
-                dest.MembershipStartDate = src.Memberships.FirstOrDefault()?.EndDate;
+                dest.MembershipEndDate = src.Memberships.FirstOrDefault()?.EndDate;
             });
 
         CreateMap<HealthRecord, HealthRecordDTO>().ReverseMap();

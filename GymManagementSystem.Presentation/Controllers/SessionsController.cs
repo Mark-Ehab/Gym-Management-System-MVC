@@ -45,24 +45,22 @@ public class SessionsController : Controller
     [HttpGet]
     public async Task<IActionResult> Create(CancellationToken ct)
     {
-        var categoryDropDownListResult = await _sessionService.GetAllPossibleSessionCategoriesForDropDownListAsync(ct);
 
-        if(categoryDropDownListResult.IsFailure)
+        var categoriesResult = await ProvideCategoryListValues(ct);
+
+        if(categoriesResult.IsFailure)
         {
-            TempData["FailureAlert"] = categoryDropDownListResult.Error!.Description;
+            TempData["FailureAlert"] = categoriesResult.Error!.Description;
             return RedirectToAction(nameof(Index));
         }
 
-        var trainerDropDownListResult = await _sessionService.GetAllPossibleSessionTrainersForDropDownListAsync(ct);
+        var trainersResult = await ProvideTrainerDropDownListValues(ct);
 
-        if (trainerDropDownListResult.IsFailure)
+        if (trainersResult.IsFailure)
         {
-            TempData["FailureAlert"] = trainerDropDownListResult.Error!.Description;
+            TempData["FailureAlert"] = trainersResult.Error!.Description;
             return RedirectToAction(nameof(Index));
         }
-
-        ViewBag.Categories = new SelectList(categoryDropDownListResult.Value, nameof(CategorySelectDTO.Id),nameof(CategorySelectDTO.Name));
-        ViewBag.Trainers = new SelectList(trainerDropDownListResult.Value, nameof(TrainerSelectDTO.Id),nameof(TrainerSelectDTO.Name));
        
         return View();
     }
@@ -74,8 +72,22 @@ public class SessionsController : Controller
     {
         if(!ModelState.IsValid)
         {
-            await ProvideCategoryListValues(ct);
-            await ProvideTrainerDropDownListValues(ct);
+            var categoriesResult = await ProvideCategoryListValues(ct);
+
+            if (categoriesResult.IsFailure)
+            {
+                TempData["FailureAlert"] = categoriesResult.Error!.Description;
+                return RedirectToAction(nameof(Index));
+            }
+
+            var trainersResult = await ProvideTrainerDropDownListValues(ct);
+
+            if (trainersResult.IsFailure)
+            {
+                TempData["FailureAlert"] = trainersResult.Error!.Description;
+                return RedirectToAction(nameof(Index));
+            }
+
             return View(createSessionViewModel);
         }
 
@@ -127,9 +139,15 @@ public class SessionsController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var sessionToBeEditedViewModel = _mapper.Map<EditSessionViewModel>(sessionToBeEditedDTOResult.Value);
+        var trainersResult = await ProvideTrainerDropDownListValues(ct);
 
-        await ProvideTrainerDropDownListValues(ct);
+        if (trainersResult.IsFailure)
+        {
+            TempData["FailureAlert"] = trainersResult.Error!.Description;
+            return RedirectToAction(nameof(Index));
+        }
+
+        var sessionToBeEditedViewModel = _mapper.Map<EditSessionViewModel>(sessionToBeEditedDTOResult.Value);
 
         return View(sessionToBeEditedViewModel);
 
@@ -142,7 +160,14 @@ public class SessionsController : Controller
     {
         if(!ModelState.IsValid)
         {
-            await ProvideTrainerDropDownListValues(ct);
+            var trainersResult = await ProvideTrainerDropDownListValues(ct);
+
+            if (trainersResult.IsFailure)
+            {
+                TempData["FailureAlert"] = trainersResult.Error!.Description;
+                return RedirectToAction(nameof(Index));
+            }
+
             return View(editSessionViewModel);
         }
 
@@ -204,14 +229,24 @@ public class SessionsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    private async Task ProvideCategoryListValues(CancellationToken ct = default)
+    private async Task<Result> ProvideCategoryListValues(CancellationToken ct = default)
     {
         var categoryDropDownListResult = await _sessionService.GetAllPossibleSessionCategoriesForDropDownListAsync(ct);
+
+        if (categoryDropDownListResult.IsFailure)
+            return Result.Failure(categoryDropDownListResult.Error!);
+
         ViewBag.Categories = new SelectList(categoryDropDownListResult.Value, nameof(CategorySelectDTO.Id), nameof(CategorySelectDTO.Name));
+        return Result.Success();
     }
-    private async Task ProvideTrainerDropDownListValues(CancellationToken ct = default)
+    private async Task<Result> ProvideTrainerDropDownListValues(CancellationToken ct = default)
     {
         var trainerDropDownListResult = await _sessionService.GetAllPossibleSessionTrainersForDropDownListAsync(ct);
+
+        if (trainerDropDownListResult.IsFailure)
+            return Result.Failure(trainerDropDownListResult.Error!);
+
         ViewBag.Trainers = new SelectList(trainerDropDownListResult.Value, nameof(TrainerSelectDTO.Id), nameof(TrainerSelectDTO.Name));
+        return Result.Success();
     }
 }

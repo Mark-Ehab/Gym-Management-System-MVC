@@ -1,4 +1,5 @@
-﻿using GymManagementSystem.Presentation.MappingProfiles;
+﻿using AutoMapper;
+using GymManagementSystem.Presentation.MappingProfiles;
 using GymManagementSystem.Presentation.Middlewares;
 
 namespace GymManagementSystem.Presentation.Extensions.ServiceCollectionExtensions;
@@ -14,7 +15,7 @@ public static class DependencyInjection
         services.AddTransient<GlobalExceptionHandler>();
 
         // Resgister Mapping Profiles for Presentation Layer
-        services.AddAutoMapper(config => config.AddProfiles([new MemberMappingProfile(),new TrainerMappingProfile(),new PlanMappingProfile(), new SessionMappingProfile(), new AnalyticsMappingProfile()]));
+        services.AddAutoMapper(config => { },typeof(DependencyInjection).Assembly);
 
         // Configure Application Cookies
         services.ConfigureApplicationCookie(options =>

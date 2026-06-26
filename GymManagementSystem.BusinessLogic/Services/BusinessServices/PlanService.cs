@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using GymManagementSystem.BusinessLogic.BusinessSpecifictions.PlanSpecifications;
+using GymManagementSystem.BusinessLogic.BusinessSpecifictions.MembershipSpecifications;
 using GymManagementSystem.BusinessLogic.Common;
 using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.PlanDTOs;

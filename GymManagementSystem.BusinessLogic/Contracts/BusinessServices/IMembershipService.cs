@@ -14,4 +14,6 @@ public interface IMembershipService
     Task<IEnumerable<AllMembershipsDTO>> GetAllMembershipsAsync(CancellationToken ct = default);
     Task<Result<IEnumerable<MemberSelectDTO>>> GetMembersForDropDownListAsync(CancellationToken ct = default);
     Task<Result<IEnumerable<PlanSelectDTO>>> GetPlansForDropDownListAsync(CancellationToken ct = default);
+    Task<Result> AddMembership(CreateMembershipDTO membershipDTO, CancellationToken ct = default);
+    Task<Result> DeleteMembership(Guid membershipId, CancellationToken ct = default);
 }
