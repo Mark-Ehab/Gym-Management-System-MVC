@@ -1,4 +1,5 @@
-﻿using GymManagementSystem.BusinessLogic.DTOs.HealthRecordDTOs;
+﻿using GymManagementSystem.BusinessLogic.Contracts;
+using GymManagementSystem.BusinessLogic.DTOs.HealthRecordDTOs;
 using GymManagementSystem.DataAccess.Enums;
 using GymManagementSystem.DataAccess.ValueObjects;
 using System;
@@ -10,6 +11,7 @@ namespace GymManagementSystem.BusinessLogic.DTOs.MemberDTOs;
 
 public sealed class MemberCreateDTO
 {
+    public IUploadedFile? PhotoFile { get; set; }
     public string Name { get; set; } = default!;
     public string Email { get; set; } = default!;
     public string Phone { get; set; } = default!;

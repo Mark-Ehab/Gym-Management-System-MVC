@@ -1,4 +1,4 @@
-﻿using GymManagementSystem.DataAccess.Models;
+﻿using GymManagementSystem.DataAccess.Models.BusinessModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -35,7 +35,7 @@ public sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
 
         builder.HasOne(s => s.Category)
             .WithMany(c => c.Sessions)
-            .HasForeignKey(s => s.CateogryId)
+            .HasForeignKey(s => s.CategoryId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(s => s.Bookings)

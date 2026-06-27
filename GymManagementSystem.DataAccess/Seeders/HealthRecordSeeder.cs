@@ -1,6 +1,6 @@
 ﻿using GymManagementSystem.DataAccess.Data.Contexts;
 using GymManagementSystem.DataAccess.Enums;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ namespace GymManagementSystem.DataAccess.Seeders;
 
 public static class HealthRecordSeeder
 {
-    public async static Task SeedHealthRecord(GymDbContext context, List<Guid> memberIds)
+    public async static Task SeedHealthRecordAsync(GymDbContext context, List<Guid> memberIds)
     {
         var healthRecordDbSet = context.HealthRecords;
 

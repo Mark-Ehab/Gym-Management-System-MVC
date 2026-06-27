@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GymManagementSystem.BusinessLogic.Contracts;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,6 +7,7 @@ namespace GymManagementSystem.BusinessLogic.DTOs.MemberDTOs;
 
 public sealed class MemberToBeEditedDTO
 {
+    public IUploadedFile? PhotoFile { get; set; } 
     public string? Photo { get; set; } 
     public string? Name { get; set; } 
     public string Email { get; set; } = default!;

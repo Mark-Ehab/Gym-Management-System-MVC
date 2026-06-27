@@ -1,6 +1,6 @@
 ﻿using GymManagementSystem.DataAccess.Data.Contexts;
 using GymManagementSystem.DataAccess.Enums;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
 using GymManagementSystem.DataAccess.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,7 +11,7 @@ namespace GymManagementSystem.DataAccess.Seeders;
 
 public static class MemberSeeder
 {
-    public async static Task<List<Guid>> SeedMember(GymDbContext context)
+    public async static Task<List<Guid>> SeedMemberAsync(GymDbContext context)
     {
         var membersDbSet = context.Members;
 
@@ -29,7 +29,6 @@ public static class MemberSeeder
                 Gender = Gender.Male,
                 DateOfBirth = new DateOnly(1998, 5, 12),
                 JoinDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-3)),
-                Photo = "members/ahmed.jpg",
                 Address = new Address
                 {
                     BuildingNumber = "12",
@@ -46,7 +45,6 @@ public static class MemberSeeder
                 Gender = Gender.Female,
                 DateOfBirth = new DateOnly(2000, 8, 21),
                 JoinDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-1)),
-                Photo = "members/sara.jpg",
                 Address = new Address
                 {
                     BuildingNumber = "45",
@@ -63,7 +61,6 @@ public static class MemberSeeder
                 Gender = Gender.Male,
                 DateOfBirth = new DateOnly(1995, 3, 14),
                 JoinDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-20)),
-                Photo = "members/omar.jpg",
                 Address = new Address
                 {
                     BuildingNumber = "7A",
@@ -80,7 +77,6 @@ public static class MemberSeeder
                 Gender = Gender.Female,
                 DateOfBirth = new DateOnly(1999, 11, 5),
                 JoinDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-6)),
-                Photo = "members/mariam.jpg",
                 Address = new Address
                 {
                     BuildingNumber = "88",
@@ -97,7 +93,6 @@ public static class MemberSeeder
                 Gender = Gender.Male,
                 DateOfBirth = new DateOnly(1997, 1, 30),
                 JoinDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-2)),
-                Photo = "members/youssef.jpg",
                 Address = new Address
                 {
                     BuildingNumber = "3",

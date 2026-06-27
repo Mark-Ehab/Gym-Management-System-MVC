@@ -12,7 +12,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
-    else if ((@TempData["FailureAlert"] is not null))
+    else if (@TempData["FailureAlert"] is not null)
     {
         @* Show Error Messages *@
         <div id="Alert" class="alert alert-danger alert-dismissible fade show">
@@ -31,7 +31,7 @@
         @* Page Content*@
         @* Show Member List if Members Exist *@
         <div class="table-responsive " style="overflow: visible;">
-            <table class="table table-borderless">
+            <table class="table table-borderless" style="vertical-align:unset">
                 <thead>
                     <tr>
                         <th><span>Photo</span></th>
@@ -49,8 +49,8 @@
                         <tr>
                             <td>
                                 <span class="avatar">
-                                    <img src="~/images/User.jpg" alt="Default Avatar" class="rounded-circle"
-                                         style="width: 40px; height: 40px;" />
+                                    <img src="@(string.IsNullOrWhiteSpace(member.Photo) ? Url.Content("~/images/default-avatar.avif") : Url.Action("ProfilePicture", "Members", new {member.Id}))" alt="Default Avatar" class="rounded-circle"
+                                         style="width: 50px; height: 50px;" />
                                 </span>
                             </td>
                             <td><span>@member.Name</span></td>

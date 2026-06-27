@@ -1,4 +1,4 @@
-﻿using GymManagementSystem.BusinessLogic.Results;
+﻿using GymManagementSystem.BusinessLogic.Common;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -25,6 +25,6 @@ public static class MemberBusinessErrors
         => new("Member.Edit.NotEdited", "Member is not edited due to an internal error !");
     public static Error MemberNotDeleted
         => new("Member.Delete.NotDeleted", "Member is not deleted due to an internal error !");
-    public static Error MemberWithActiveBookingsCannotBeDeleted
-        => new("Member.Delete.ActiveBookings.CannotDelete", "This member has already active bookings on the system and cannot be deleted !");
+    public static Error MemberWithActiveCurrentOrFutureBookingsCannotBeDeleted
+        => new("Member.Delete.ActiveBookings.CannotDelete", "This member has already active current or future bookings on the system and cannot be deleted !");
 }

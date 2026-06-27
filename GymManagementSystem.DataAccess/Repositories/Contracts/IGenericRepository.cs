@@ -1,4 +1,5 @@
-﻿using GymManagementSystem.DataAccess.Models;
+﻿using GymManagementSystem.DataAccess.Models.BusinessModels;
+using GymManagementSystem.DataAccess.Specifiction.Contract;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -8,12 +9,14 @@ namespace GymManagementSystem.DataAccess.Repositories.Contracts;
 
 public interface IGenericRepository<TEntity> where TEntity : BaseEntity, new()
 {
-    Task<IReadOnlyList<TEntity>?> GetAllAsync(CancellationToken ct , bool noTrackingEnabled = false, bool softDeletedItemsEnabled = false);
-    Task<TEntity?> GetByIdAsync(Guid id, CancellationToken ct, bool noTrackingEnabled = false, bool softDeletedItemsEnabled = false);
+    Task<IReadOnlyList<TEntity>?> GetAllAsync(bool noTrackingEnabled = false, bool softDeletedItemsEnabled = false, CancellationToken ct = default);
+    Task<TEntity?> GetByIdAsync(Guid id,bool noTrackingEnabled = false, bool softDeletedItemsEnabled = false, CancellationToken ct = default);
+    Task<TEntity?> FirstOrDefaultAsync(ISpecificaion<TEntity>? specificaion = null, bool TrackingEnabled = false, CancellationToken ct = default);
+    Task<bool> AnyAsync(ISpecificaion<TEntity>? specificaion = null, CancellationToken ct = default);
+    Task<int> CountAsync(ISpecificaion<TEntity>? specificaion = null, CancellationToken ct = default);
+    Task<IReadOnlyList<TEntity>> ListAsync(ISpecificaion<TEntity> specificaion, bool TrackingEnabled = false, CancellationToken ct = default);
+    Task<int> SaveChangesAsync(CancellationToken ct);
     void Add(TEntity entity);
     void Update(TEntity entity);
     void SoftDelete(TEntity entity);
-    Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity,bool>> predicate, CancellationToken ct, bool TrackingEnabled = false);
-    Task<bool> AnyAsync(Expression<Func<TEntity,bool>> predicate, CancellationToken ct);
-    Task<int> SaveChangesAsync(CancellationToken ct);
 }

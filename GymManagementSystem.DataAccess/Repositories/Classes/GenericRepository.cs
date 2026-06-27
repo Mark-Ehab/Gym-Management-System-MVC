@@ -1,6 +1,8 @@
 ﻿using GymManagementSystem.DataAccess.Data.Contexts;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
+using GymManagementSystem.DataAccess.Specifiction.Classes;
+using GymManagementSystem.DataAccess.Specifiction.Contract;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,7 +11,7 @@ using System.Text;
 
 namespace GymManagementSystem.DataAccess.Repositories.Classes;
 
-public sealed class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : BaseEntity, new()
+public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : BaseEntity, new()
 {
     /* Fields */
     private readonly GymDbContext _gymDbContext;
@@ -23,28 +25,28 @@ public sealed class GenericRepository<TEntity> : IGenericRepository<TEntity> whe
     }
 
     /* Methods */
-    public async Task<IReadOnlyList<TEntity>?> GetAllAsync(CancellationToken ct, bool noTrackingEnabled = false, bool softDeletedItemsEnabled = false)
+    public async Task<IReadOnlyList<TEntity>?> GetAllAsync(bool noTrackingEnabled = false, bool softDeletedItemsEnabled = false, CancellationToken ct = default)
     {
         var query = _entityDbSet.AsQueryable();
 
         if (noTrackingEnabled)
-            query = _entityDbSet.AsNoTracking();
+            query = query.AsNoTracking();
 
         if (softDeletedItemsEnabled)
-            query = _entityDbSet.IgnoreQueryFilters();
+            query = query.IgnoreQueryFilters();
 
         return await query.ToListAsync(ct);
     }
     
-    public async Task<TEntity?> GetByIdAsync(Guid id, CancellationToken ct, bool noTrackingEnabled = false, bool softDeletedItemsEnabled = false)
+    public async Task<TEntity?> GetByIdAsync(Guid id, bool noTrackingEnabled = false, bool softDeletedItemsEnabled = false, CancellationToken ct = default)
     {
         var query = _entityDbSet.AsQueryable();
 
         if (noTrackingEnabled)
-            query = _entityDbSet.AsNoTracking();
+            query = query.AsNoTracking();
 
         if (softDeletedItemsEnabled)
-            query = _entityDbSet.IgnoreQueryFilters();
+            query = query.IgnoreQueryFilters();
 
         return await query.FirstOrDefaultAsync(e => e.Id == id, ct);
     }    
@@ -56,14 +58,33 @@ public sealed class GenericRepository<TEntity> : IGenericRepository<TEntity> whe
         => _entityDbSet.Remove(entity);    
 
     public void Update(TEntity entity)
-        => _entityDbSet.Update(entity);    
+        => _entityDbSet.Update(entity);
 
-    public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct, bool TrackingEnabled = false)
-        => !TrackingEnabled ? await _entityDbSet.AsNoTracking().FirstOrDefaultAsync(predicate,ct) : await _entityDbSet.FirstOrDefaultAsync(predicate, ct);
-   
-    public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct)
-        => await _entityDbSet.AnyAsync(predicate,ct);
+    public async Task<TEntity?> FirstOrDefaultAsync(ISpecificaion<TEntity>? specificaion = null, bool TrackingEnabled = false, CancellationToken ct = default)
+    {
+        if (specificaion is not null)
+            return !TrackingEnabled ? await ApplySpecification(specificaion).AsNoTracking().FirstOrDefaultAsync(ct) : await ApplySpecification(specificaion).FirstOrDefaultAsync(ct);
+        
+        return !TrackingEnabled ? await _entityDbSet.AsNoTracking().FirstOrDefaultAsync(ct) : await _entityDbSet.FirstOrDefaultAsync(ct);
+    }
+
+    public async Task<bool> AnyAsync(ISpecificaion<TEntity>? specificaion = null, CancellationToken ct = default)
+        => specificaion is not null ?
+            await ApplySpecification(specificaion).AnyAsync(ct) :
+            await _entityDbSet.AnyAsync(ct);
+
+    public async Task<IReadOnlyList<TEntity>> ListAsync(ISpecificaion<TEntity> specificaion, bool TrackingEnabled = false, CancellationToken ct = default)
+        => !TrackingEnabled ? await ApplySpecification(specificaion).AsNoTracking().ToListAsync(ct) : await ApplySpecification(specificaion).ToListAsync(ct);
+
+    public async Task<int> CountAsync(ISpecificaion<TEntity>? specificaion = null, CancellationToken ct = default)
+        => specificaion is not null ? 
+            await ApplySpecification(specificaion).CountAsync(ct) :
+            await _entityDbSet.CountAsync();
 
     public async Task<int> SaveChangesAsync(CancellationToken ct)
         => await _gymDbContext.SaveChangesAsync(ct);
+
+    private IQueryable<TEntity> ApplySpecification(ISpecificaion<TEntity> specificaion)
+        => SpecificationEvaluator<TEntity>.GetQuery(_entityDbSet, specificaion);
+
 }

@@ -1,20 +1,25 @@
-﻿using GymManagementSystem.BusinessLogic.Contracts.Services;
+﻿using AutoMapper;
+using GymManagementSystem.BusinessLogic.Common;
+using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.TrainerDTOs;
-using GymManagementSystem.BusinessLogic.Results;
 using GymManagementSystem.Presentation.ViewModels.TrainerViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GymManagementSystem.Presentation.Controllers;
 
+[Authorize]
 public sealed class TrainersController : Controller
 {
     /* Fields */
     private readonly ITrainerService _trainerService;
+    private readonly IMapper _mapper;
 
     /* Constructor */
-    public TrainersController(ITrainerService service)
+    public TrainersController(ITrainerService service,IMapper mapper)
     {
         _trainerService = service;
+        _mapper = mapper;
     }
 
     /* Actions (Endpoints) */
@@ -27,14 +32,7 @@ public sealed class TrainersController : Controller
         if (allTrainersDTOs is null)
             return View();
 
-        var allTrainersViewModels = allTrainersDTOs.Select(atd => new AllTrainersViewModel()
-        {
-            Id = atd.Id,
-            Name = atd.Name,
-            Email = atd.Email,
-            Phone = atd.Phone,
-            Specialization = atd.Speciality.ToString()
-        });
+        var allTrainersViewModels = _mapper.Map<IEnumerable<AllTrainersViewModel>>(allTrainersDTOs);
 
         return View(allTrainersViewModels);
     }
@@ -43,7 +41,7 @@ public sealed class TrainersController : Controller
     [HttpGet]
     public async Task<IActionResult> Details(Guid id, CancellationToken ct)
     {
-        var trainerDetailsDTOResult = await _trainerService.GetTrainerDetailsAsync(id,ct);
+        var trainerDetailsDTOResult = await _trainerService.GetTrainerDetailsAsync(id, ct);
 
         if (trainerDetailsDTOResult.IsFailure)
         {
@@ -51,15 +49,7 @@ public sealed class TrainersController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var trainerDetailsViewModel = new TrainerDetailsViewModel()
-        {
-            Name = trainerDetailsDTOResult.Value.Name,
-            Email = trainerDetailsDTOResult.Value.Email,
-            Phone = trainerDetailsDTOResult.Value.Phone,
-            DateOfBirth = trainerDetailsDTOResult.Value.DateOBirth.ToString(),
-            Specialization = trainerDetailsDTOResult.Value.Speciality.ToString(),
-            Address = string.Join(" - ", trainerDetailsDTOResult.Value.BuildingNumber, trainerDetailsDTOResult.Value.Street, trainerDetailsDTOResult.Value.City)
-        };
+        var trainerDetailsViewModel = _mapper.Map<TrainerDetailsViewModel>(trainerDetailsDTOResult.Value);
 
         return View(trainerDetailsViewModel);
     }
@@ -71,25 +61,15 @@ public sealed class TrainersController : Controller
 
     // POST BaseURL/Trainers/Create
     [HttpPost]
-    public async Task<IActionResult> Create(TrainerCreateViewModel model ,CancellationToken ct)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(TrainerCreateViewModel model, CancellationToken ct)
     {
-        if(!ModelState.IsValid)
+        if (!ModelState.IsValid)
             return View(model);
 
-        var trainerCreateDTO = new TrainerCreateDTO()
-        { 
-            Name=model.Name,
-            Email=model.Email,
-            Phone=model.Phone,
-            Gender = model.Gender,
-            DateOfBirth = model.DateOfBirth,
-            Speciality = model.Specialties,
-            BuildingNumber = model.BuildingNumber,
-            City = model.City,
-            Street = model.Street
-        };
+        var trainerCreateDTO = _mapper.Map<TrainerCreateDTO>(model);
 
-        var result = await _trainerService.AddTrainerAsync(trainerCreateDTO,ct);
+        var result = await _trainerService.AddTrainerAsync(trainerCreateDTO, ct);
 
         if (result.IsSuccessful)
         {
@@ -105,9 +85,9 @@ public sealed class TrainersController : Controller
 
     // GET BaseURL/Trainers/Edit/{id}
     [HttpGet]
-    public async Task<IActionResult> Edit(Guid id ,CancellationToken ct)
+    public async Task<IActionResult> Edit(Guid id, CancellationToken ct)
     {
-        var trainerToBeEditedDTOResult = await _trainerService.GetTrainerToBeEditedAsync(id,ct);
+        var trainerToBeEditedDTOResult = await _trainerService.GetTrainerToBeEditedAsync(id, ct);
 
         if (trainerToBeEditedDTOResult.IsFailure)
         {
@@ -115,39 +95,22 @@ public sealed class TrainersController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var trainerToBeEditedViewModel = new TrainerToBeEditedViewModel()
-        {
-            Name = trainerToBeEditedDTOResult.Value.Name,
-            Email = trainerToBeEditedDTOResult.Value.Email,
-            Phone = trainerToBeEditedDTOResult.Value.Phone,
-            Specialties = trainerToBeEditedDTOResult.Value.Speciality,
-            BuildingNumber = trainerToBeEditedDTOResult.Value.BuildingNumber,
-            Street = trainerToBeEditedDTOResult.Value.Street,
-            City = trainerToBeEditedDTOResult.Value.City
-        };
+        var trainerToBeEditedViewModel = _mapper.Map<TrainerToBeEditedViewModel>(trainerToBeEditedDTOResult.Value);
 
         return View(trainerToBeEditedViewModel);
     }
 
     // POST BaseURL/Trainers/Edit/{id}
     [HttpPost]
-    public async Task<IActionResult> Edit([FromRoute] Guid id ,TrainerToBeEditedViewModel model ,CancellationToken ct)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit([FromRoute] Guid id, TrainerToBeEditedViewModel model, CancellationToken ct)
     {
-        if(!ModelState.IsValid)
+        if (!ModelState.IsValid)
             return View(model);
 
-        var trainerToBeEditedDTO = new TrainerToBeEditedDTO()
-        {
-            Name = model.Name,
-            Email = model.Email,
-            Phone = model.Phone,
-            Speciality = model.Specialties,
-            BuildingNumber = model.BuildingNumber,
-            Street = model.Street,
-            City = model.City,
-        };
+        var trainerToBeEditedDTO = _mapper.Map<TrainerToBeEditedDTO>(model);
 
-        var result = await _trainerService.EditTrainerAsync(id,trainerToBeEditedDTO,ct);
+        var result = await _trainerService.EditTrainerAsync(id, trainerToBeEditedDTO, ct);
 
         if (result.IsSuccessful)
         {
@@ -168,6 +131,7 @@ public sealed class TrainersController : Controller
 
     // POST BaseURL/Trainers/Delete/{id}
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken ct)
     {
         var result = await _trainerService.DeleteTrainerAsync(id, ct);

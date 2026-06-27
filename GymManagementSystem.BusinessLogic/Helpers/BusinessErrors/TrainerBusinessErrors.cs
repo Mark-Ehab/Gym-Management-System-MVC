@@ -1,4 +1,4 @@
-﻿using GymManagementSystem.BusinessLogic.Results;
+﻿using GymManagementSystem.BusinessLogic.Common;
 using System;
 using System.Collections.Generic;
 using System.Text;

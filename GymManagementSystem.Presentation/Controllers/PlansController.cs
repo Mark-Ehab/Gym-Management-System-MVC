@@ -1,7 +1,9 @@
-﻿using GymManagementSystem.BusinessLogic.Contracts.Services;
+﻿using AutoMapper;
+using GymManagementSystem.BusinessLogic.Contracts.BusinessServices;
 using GymManagementSystem.BusinessLogic.DTOs.PlanDTOs;
 using GymManagementSystem.DataAccess.Models;
 using GymManagementSystem.Presentation.ViewModels.PlanViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -9,15 +11,18 @@ using System.Text;
 
 namespace GymManagementSystem.Presentation.Controllers;
 
+[Authorize]
 public sealed class PlansController : Controller
 {
     /* Fields */
     private readonly IPlanService _planService;
+    private readonly IMapper _mapper;
 
     /* Constructor */
-    public PlansController(IPlanService service)
+    public PlansController(IPlanService service, IMapper mapper)
     {
         _planService = service;
+        _mapper = mapper;
     }
 
     /* Actions (Endpoints) */
@@ -30,15 +35,7 @@ public sealed class PlansController : Controller
         if (!allPlansDTOs.Any())
             return View();
 
-        var allPlanViewModels = allPlansDTOs.Select(apd => new AllPlansViewModel
-        {
-            Id = apd.Id,
-            Name = apd.Name,
-            Price = apd.Price,
-            Description = apd.Description,
-            DurationDays = apd.DurationDays,
-            Active = apd.Status
-        });
+        var allPlanViewModels = _mapper.Map<IEnumerable<AllPlansViewModel>>(allPlansDTOs);
 
         return View(allPlanViewModels);
     }
@@ -47,22 +44,15 @@ public sealed class PlansController : Controller
     [HttpGet]
     public async Task<IActionResult> Details(Guid id, CancellationToken ct)
     {
-        var planDetailsDTOResult = await _planService.GetPlanDetailsAsync(id,ct);
+        var planDetailsDTOResult = await _planService.GetPlanDetailsAsync(id, ct);
 
-        if(planDetailsDTOResult.IsFailure)
+        if (planDetailsDTOResult.IsFailure)
         {
             TempData["FailureAlert"] = planDetailsDTOResult.Error!.Description;
             return RedirectToAction(nameof(Index));
         }
 
-        var planDetailsViewModel = new PlanDetailsViewModel
-        {
-            Name = planDetailsDTOResult.Value.Name,
-            Price = planDetailsDTOResult.Value.Price,
-            Description = planDetailsDTOResult.Value.Description,
-            DurationDays = planDetailsDTOResult.Value.DurationDays,
-            Status = planDetailsDTOResult.Value.Status ? "Active" : "Inactive"
-        };
+        var planDetailsViewModel = _mapper.Map<PlanDetailsViewModel>(planDetailsDTOResult.Value);
 
         return View(planDetailsViewModel);
     }
@@ -71,7 +61,7 @@ public sealed class PlansController : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id, CancellationToken ct)
     {
-        var planTobeEditedDTOResult = await _planService.GetPlanToBeEditedAsync(id);
+        var planTobeEditedDTOResult = await _planService.GetPlanToBeEditedAsync(id,ct);
 
         if (planTobeEditedDTOResult.IsFailure)
         {
@@ -79,33 +69,22 @@ public sealed class PlansController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var planToBeEditedViewModel = new PlanToBeEditedViewModel()
-        {
-            Name = planTobeEditedDTOResult.Value.Name,
-            Price= planTobeEditedDTOResult.Value.Price,
-            Description= planTobeEditedDTOResult.Value.Description,
-            DurationDays = planTobeEditedDTOResult.Value.DurationDays
-        };
+        var planToBeEditedViewModel = _mapper.Map<PlanToBeEditedViewModel>(planTobeEditedDTOResult.Value);
 
         return View(planToBeEditedViewModel);
     }
 
     // POST BaseURL/Plans/Edit/{id}
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit([FromRoute] Guid id, PlanToBeEditedViewModel model, CancellationToken ct)
     {
         if (!ModelState.IsValid)
             return View(model);
 
-        var modelDTO = new PlanToBeEditedDTO()
-        {
-            Name = model.Name,
-            Price = model.Price,
-            Description = model.Description,
-            DurationDays = model.DurationDays
-        };
+        var modelDTO = _mapper.Map<PlanToBeEditedDTO>(model); 
 
-        var result = await _planService.UpdatePlanToBeEditedAsync(id,modelDTO,ct);
+        var result = await _planService.UpdatePlanToBeEditedAsync(id, modelDTO, ct);
 
         if (result.IsSuccessful)
         {
@@ -121,9 +100,10 @@ public sealed class PlansController : Controller
 
     // POST BaseURL/Plans/Activate/{id}
     [HttpPost]
-    public async Task<IActionResult> Activate(Guid id)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Activate(Guid id, CancellationToken ct)
     {
-        var result = await _planService.ChangePlanStatusAsync(id);
+        var result = await _planService.ChangePlanStatusAsync(id,ct);
 
         if (result.IsSuccessful)
         {

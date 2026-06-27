@@ -1,54 +1,81 @@
-using GymManagementSystem.BusinessLogic.Contracts.Services;
+using GymManagementSystem.BusinessLogic.Extensions.ServiceCollectionExtensions;
 using GymManagementSystem.BusinessLogic.Services;
 using GymManagementSystem.DataAccess.Data.Contexts;
+using GymManagementSystem.DataAccess.Extensions.ServiceCollectionExtensions;
 using GymManagementSystem.DataAccess.Interceptors;
 using GymManagementSystem.DataAccess.Repositories.Classes;
 using GymManagementSystem.DataAccess.Repositories.Contracts;
 using GymManagementSystem.DataAccess.Seeders;
+using GymManagementSystem.Presentation.Extensions.ServiceCollectionExtensions;
+using GymManagementSystem.Presentation.Extensions.WebApplicationExtensions;
+using GymManagementSystem.Presentation.Middlewares;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.Seq("http://localhost:5341")
+    .CreateBootstrapLogger();
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<IPlanService,PlanService>();
-builder.Services.AddScoped<IMemberService,MemberService>();
-builder.Services.AddScoped<ITrainerService,TrainerService>();
-builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
-
-// Register GymDbContext to DI Container
-builder.Services.AddDbContext<GymDbContext>(options =>
-
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-    .AddInterceptors(new SoftDeleteInterceptor(),new AuditColumnsInterceptor())
-);
-
-var app = builder.Build();
-
-/* Seed Database on Startup */
-using var scope = app.Services.CreateScope();
-var scopedGymDbContext = scope.ServiceProvider.GetRequiredService<GymDbContext>();
-await scopedGymDbContext!.Database.MigrateAsync();
-await Seeder.SeedAllAsync(scopedGymDbContext);
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+try 
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    Log.Information("Gym Management system is starting ...");
+
+    // Create Web Application builder
+    var builder = WebApplication.CreateBuilder(args);
+
+    // Configure Serilog as default logger
+    builder.Host.UseSerilog((context, loggerConfiguration) =>
+    {
+        loggerConfiguration.ReadFrom.Configuration(context.Configuration);
+    });
+
+    // Register Presentation layer services to the DI container.
+    builder.Services.AddPresentation();
+
+    // Register Business Logic layer services to the DI container.
+    builder.Services.AddBusinessLogic();
+
+    // Register Data Access layer services to the DI container.
+    builder.Services.AddDataAccess(builder.Configuration);
+
+    var app = builder.Build();
+
+    // Migrate and seed database
+    await app.MigrateAndSeedDatabase(builder.Configuration);
+
+    //app.UseGlobalExceptionHandler();
+
+    // Configure the HTTP request pipeline.
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Home/Error");
+        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        app.UseHsts();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseRouting();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.UseSerilogRequestLogging();
+
+    app.MapStaticAssets();
+
+    app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Account}/{action=Login}/{id?}")
+        .WithStaticAssets();
+
+    app.Run();
 }
-
-app.UseHttpsRedirection();
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.MapStaticAssets();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "The Application failed to start correctly!");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

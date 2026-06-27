@@ -1,15 +1,17 @@
 ﻿using GymManagementSystem.DataAccess.Data.Contexts;
-using GymManagementSystem.DataAccess.Models;
+using GymManagementSystem.DataAccess.Models.BusinessModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
+using System.Text.Json;
 
 namespace GymManagementSystem.DataAccess.Seeders;
 
 public static class PlanSeeder
 {
-    public async static Task SeedPlan(GymDbContext context)
+    public async static Task SeedPlanAsync(GymDbContext context, string folderPath)
     {
         var plansDbSet = context.Plans;
 
@@ -17,46 +19,28 @@ public static class PlanSeeder
         if (await plansDbSet.AnyAsync())
             return;
 
-        var plans = new List<Plan>
+        try
         {
-            new()
-            {
-                Name = "Basic",
-                Description = "Access to gym equipment only",
-                DurationDays = 30,
-                Price = 499,
-                IsActive = true
-            },
+            /* Seed plans table from external Json file */
+            var planSeedingFilePath = Path.Combine(folderPath, "plans.json");
 
-            new()
-            {
-                Name = "Standard",
-                Description = "Gym access with 5 group sessions",
-                DurationDays = 90,
-                Price = 1299,
-                IsActive = true
-            },
+            /* Ckeck if this file exists */
+            if (!File.Exists(planSeedingFilePath))
+                throw new FileNotFoundException($"The file whose path is {planSeedingFilePath} doesn't exist");
 
-            new()
-            {
-                Name = "Premium",
-                Description = "Unlimited gym and personal trainer sessions",
-                DurationDays = 180,
-                Price = 2499,
-                IsActive = true
-            },
+            var plansData = File.ReadAllText(planSeedingFilePath);
 
-            new()
+            var plans = JsonSerializer.Deserialize<List<Plan>>(plansData,new JsonSerializerOptions()
             {
-                Name = "Annual",
-                Description = "Full VIP membership with nutrition follow-up",
-                DurationDays = 365,
-                Price = 4999,
-                IsActive = true
-            }
-        };
+                PropertyNameCaseInsensitive = true,
+            }) ?? [];
 
-        plansDbSet.AddRange(plans);
-        await context.SaveChangesAsync();
+                plansDbSet.AddRange(plans);
+            await context.SaveChangesAsync();
+        }
+        catch(Exception ex) 
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 }

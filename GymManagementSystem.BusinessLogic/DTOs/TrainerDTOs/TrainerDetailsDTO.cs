@@ -10,7 +10,7 @@ public sealed class TrainerDetailsDTO
     public string Name { get; set; } = default!;
     public string Email { get; set; } = default!;
     public string Phone { get; set; } = default!;
-    public DateOnly DateOBirth { get; set; }
+    public DateOnly DateOfBirth { get; set; }
     public Speciality Speciality { get; set; }
     public string BuildingNumber {  get; set; } = default!;
     public string Street {  get; set; } = default!;
