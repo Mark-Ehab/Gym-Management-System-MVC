@@ -13,6 +13,7 @@ A layered **ASP.NET Core MVC** web application for managing gym operations such 
 - [Project Structure](#project-structure)
 - [Main Modules](#main-modules)
 - [Database and Seeding](#database-and-seeding)
+- [Entity Relationship Diagram ERD](#entity-relationship-diagram-erd)
 - [Default Login Accounts](#default-login-accounts)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
@@ -23,9 +24,7 @@ A layered **ASP.NET Core MVC** web application for managing gym operations such 
 - [Security Notes](#security-notes)
 - [Logging](#logging)
 - [Troubleshooting](#troubleshooting)
-- [Future Enhancements](#future-enhancements)
 - [Contributing](#contributing)
-- [License](#license)
 
 ---
 
@@ -349,6 +348,123 @@ This means the application is intended to create/update the database schema and 
 
 ---
 
+## Entity Relationship Diagram ERD
+
+The following ERD summarizes the main business entities and how they are connected in the database. It focuses on the gym domain models such as members, trainers, plans, memberships, sessions, bookings, categories, and health records.
+
+```mermaid
+erDiagram
+    MEMBER ||--|| HEALTH_RECORD : has
+    MEMBER ||--o{ MEMBERSHIP : owns
+    PLAN ||--o{ MEMBERSHIP : includes
+    TRAINER ||--o{ SESSION : leads
+    CATEGORY ||--o{ SESSION : classifies
+    MEMBER ||--o{ BOOKING : makes
+    SESSION ||--o{ BOOKING : receives
+
+    MEMBER {
+        Guid Id PK
+        string Name
+        string Email
+        string Phone
+        DateOnly DateOfBirth
+        Gender Gender
+        DateOnly JoinDate
+        string Photo
+        DateTime CreatedAt
+        DateTime ModifiedAt
+        bool IsDeleted
+    }
+
+    TRAINER {
+        Guid Id PK
+        string Name
+        string Email
+        string Phone
+        DateOnly DateOfBirth
+        Gender Gender
+        Speciality Speciality
+        DateOnly HireDate
+        DateTime CreatedAt
+        DateTime ModifiedAt
+        bool IsDeleted
+    }
+
+    HEALTH_RECORD {
+        Guid Id PK
+        Guid MemberId FK
+        decimal Height
+        decimal Weight
+        BloodType BloodType
+        string Note
+        DateOnly LastUpdate
+    }
+
+    PLAN {
+        Guid Id PK
+        string Name
+        string Description
+        int DurationDays
+        decimal Price
+        bool IsActive
+    }
+
+    MEMBERSHIP {
+        Guid Id PK
+        Guid MemberId FK
+        Guid PlanId FK
+        DateOnly StartDate
+        DateOnly EndDate
+        string Status
+        bool IsActive
+    }
+
+    CATEGORY {
+        Guid Id PK
+        string Name
+    }
+
+    SESSION {
+        Guid Id PK
+        Guid TrainerId FK
+        Guid CategoryId FK
+        string Description
+        byte Capacity
+        DateTime StartDate
+        DateTime EndDate
+        string Status
+    }
+
+    BOOKING {
+        Guid Id PK
+        Guid MemberId FK
+        Guid SessionId FK
+        DateTime BookingDate
+        bool IsAttended
+    }
+```
+
+### Relationship Summary
+
+| Relationship | Type | Description |
+|---|---|---|
+| Member to HealthRecord | One-to-One | Each member has one health record containing height, weight, blood type, notes, and last update date. |
+| Member to Membership | One-to-Many | A member can have multiple memberships over time. |
+| Plan to Membership | One-to-Many | A plan can be assigned to many memberships. |
+| Trainer to Session | One-to-Many | A trainer can lead many sessions. |
+| Category to Session | One-to-Many | A category can classify many sessions. |
+| Member to Booking | One-to-Many | A member can book many sessions. |
+| Session to Booking | One-to-Many | A session can have many member bookings. |
+
+### Notes
+
+- `Member` and `Trainer` inherit shared user fields from `GymUser`, such as name, email, phone, date of birth, gender, and address.
+- Most business entities inherit common audit fields from `BaseEntity`, including `Id`, `CreatedAt`, `ModifiedAt`, `DeletedAt`, and `IsDeleted`.
+- `Membership.EndDate`, `Membership.Status`, `Membership.IsActive`, and `Session.Status` are calculated from existing dates and business rules.
+- Authentication and authorization tables are handled separately by ASP.NET Core Identity and are not included in this business-domain ERD.
+
+---
+
 ## Default Login Accounts
 
 The application supports seeded identity users configured through `appsettings.json`. For security reasons, do not document or commit real emails, passwords, or production credentials.
@@ -640,24 +756,6 @@ dotnet ef --version
 
 ---
 
-## Future Enhancements
-
-Possible improvements for future versions:
-
-- Add dashboard statistics for members, sessions, plans, and bookings.
-- Add payment and invoice tracking.
-- Add membership renewal notifications.
-- Add email notifications for bookings and cancellations.
-- Add advanced search and filtering.
-- Add pagination for large datasets.
-- Add API endpoints for mobile or SPA clients.
-- Add automated tests for services and controllers.
-- Add Docker support for the web app, SQL Server, and Seq.
-- Add CI/CD pipeline using GitHub Actions.
-- Add production-ready secret management.
-
----
-
 ## Contributing
 
 Contributions are welcome.
@@ -689,14 +787,12 @@ Please keep changes focused, readable, and consistent with the existing layered 
 
 ---
 
-## License
-
-No license file is currently included in the repository. Add a license file if you want to define how others may use, modify, or distribute this project.
-
----
-
 ## Author
 
 Repository owner: [Mark-Ehab](https://github.com/Mark-Ehab)
 
 Project repository: [Gym-Management-System-MVC](https://github.com/Mark-Ehab/Gym-Management-System-MVC)
+
+---
+
+Made with ❤️ by Mark Ehab
