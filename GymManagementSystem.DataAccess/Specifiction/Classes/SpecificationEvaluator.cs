@@ -14,12 +14,12 @@ public static class SpecificationEvaluator<TEntity> where TEntity : BaseEntity, 
     {
         IQueryable<TEntity> query = baseQuery;
 
-        if(specification.Criteria is not null)
-            query = query.Where(specification.Criteria);
-
         if (specification.IncludeLambdas.Count > 0)
             query = specification.IncludeLambdas.Aggregate(query,(current, Include)
                     => Include(current));
+
+        if(specification.Criteria is not null)
+            query = query.Where(specification.Criteria);
 
         if(specification.OrderBys.Count > 0)
         {

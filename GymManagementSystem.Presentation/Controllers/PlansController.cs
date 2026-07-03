@@ -32,9 +32,6 @@ public sealed class PlansController : Controller
     {
         var allPlansDTOs = await _planService.GetAllPlansAsync(ct);
 
-        if (!allPlansDTOs.Any())
-            return View();
-
         var allPlanViewModels = _mapper.Map<IEnumerable<AllPlansViewModel>>(allPlansDTOs);
 
         return View(allPlanViewModels);

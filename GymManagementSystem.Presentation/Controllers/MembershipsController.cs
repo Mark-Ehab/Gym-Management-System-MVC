@@ -43,7 +43,7 @@ public class MembershipsController : Controller
     [HttpGet]
     public async Task<IActionResult> Create(CancellationToken ct)
     {
-        var result = await ProvidePlansAndMembersDropDownListsValues(ct);
+        var result = await ProvidePlansAndMembersDropDownListsValuesAsync(ct);
 
         if(result.IsFailure)
         {
@@ -63,7 +63,7 @@ public class MembershipsController : Controller
 
         if (!ModelState.IsValid)
         {
-            plansAndMembersResult = await ProvidePlansAndMembersDropDownListsValues(ct);
+            plansAndMembersResult = await ProvidePlansAndMembersDropDownListsValuesAsync(ct);
 
             if (plansAndMembersResult.IsFailure)
             {
@@ -86,7 +86,7 @@ public class MembershipsController : Controller
 
         TempData["FailureAlert"] = result.Error!.Description;
 
-        plansAndMembersResult = await ProvidePlansAndMembersDropDownListsValues(ct);
+        plansAndMembersResult = await ProvidePlansAndMembersDropDownListsValuesAsync(ct);
 
         if (plansAndMembersResult.IsFailure)
         {
@@ -116,7 +116,7 @@ public class MembershipsController : Controller
         }
     }
 
-    private async Task<Result> ProvidePlansAndMembersDropDownListsValues(CancellationToken ct)
+    private async Task<Result> ProvidePlansAndMembersDropDownListsValuesAsync(CancellationToken ct)
     {
         var plansResult = await _membershipService.GetPlansForDropDownListAsync(ct);
 

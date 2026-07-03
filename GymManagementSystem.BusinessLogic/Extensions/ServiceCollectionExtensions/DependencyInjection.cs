@@ -24,6 +24,7 @@ public static class DependencyInjection
         services.AddScoped<IMemberService, MemberService>();
         services.AddScoped<ITrainerService, TrainerService>();
         services.AddScoped<ISessionService, SessionService>();
+        services.AddScoped<IBookingService, BookingService>();
         services.AddAutoMapper(config => { }, typeof(DependencyInjection).Assembly);
     }
 }

@@ -1,0 +1,130 @@
+﻿@model IEnumerable<AllSessionsViewModel>
+
+<div class="container">
+    @if(Model.Any())
+    {
+        <header class="d-flex justify-content-between mt-5 mb-4 align-items-center">
+            <div>
+                <h2 class="text-primary-color mb-0">Member Sessions</h2>
+                <p class="text-muted">Session Valid For Manage Booking</p>
+            </div>
+        </header>
+
+        <div class="row g-4 ">
+            @foreach (var upcomingSession in Model.Where(s => s.Status == "Upcoming"))
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0 session-card">
+                        <div class="card-header text-white py-3 bg-primary ">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-calendar-event me-2"></i>@upcomingSession.CategoryName
+                                </h5>
+                                <span class="badge bg-light text-dark">Upcoming</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-3">@upcomingSession.Description</p>
+
+                            <div class="session-info mb-3">
+                                <div class="info-item mb-2">
+                                    <i class="bi bi-person-circle text-primary-color me-2"></i>
+                                    <strong>Trainer:</strong> @upcomingSession.TrainerName
+                                </div>
+                                <div class="info-item mb-2">
+                                    <i class="bi bi-calendar3 text-primary-color me-2"></i>
+                                    <strong>Date:</strong> @upcomingSession.DateDisplay
+                                </div>
+                                <div class="info-item mb-2">
+                                    <i class="bi bi-clock text-primary-color me-2"></i>
+                                    <strong>Time:</strong> @upcomingSession.TimeDisplay
+                                </div>
+                                <div class="info-item mb-2">
+                                    <i class="bi bi-hourglass-split text-primary-color me-2"></i>
+                                    <strong>Duration:</strong> @upcomingSession.Duration
+                                </div>
+                                <div class="info-item">
+                                    <i class="bi bi-people text-primary-color me-2"></i>
+                                    <strong>Capacity:</strong> @upcomingSession.AvailableSlots/@upcomingSession.Capacity slots
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-0">
+                            <div class="d-grid gap-2">
+                                <a asp-controller="Bookings" asp-action="UpcomingSessionMembers" asp-route-id="@upcomingSession.Id" class="btn btn-outline btn-sm">
+                                    <i class="bi bi-eye me-1"></i> View Members
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+
+        <header class="d-flex justify-content-between mt-5 mb-4 align-items-center">
+            <div>
+                <h2 class="text-primary-color mb-0">Member Sessions</h2>
+                <p class="text-muted">Session Valid For Manage Attendance</p>
+            </div>
+        </header>
+        <div class="row g-4 ">
+            @foreach (var ongoingSession in Model.Where(s => s.Status == "Ongoing"))
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0 session-card">
+                        <div class="card-header text-white py-3 bg-success ">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-calendar-event me-2"></i>@ongoingSession.CategoryName
+                                </h5>
+                                <span class="badge bg-light text-dark">Ongoing</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-3">@ongoingSession.Description</p>
+
+                            <div class="session-info mb-3">
+                                <div class="info-item mb-2">
+                                    <i class="bi bi-person-circle text-primary-color me-2"></i>
+                                    <strong>Trainer:</strong> @ongoingSession.TrainerName
+                                </div>
+                                <div class="info-item mb-2">
+                                    <i class="bi bi-calendar3 text-primary-color me-2"></i>
+                                    <strong>Date:</strong> @ongoingSession.DateDisplay
+                                </div>
+                                <div class="info-item mb-2">
+                                    <i class="bi bi-clock text-primary-color me-2"></i>
+                                    <strong>Time:</strong> @ongoingSession.TimeDisplay
+                                </div>
+                                <div class="info-item mb-2">
+                                    <i class="bi bi-hourglass-split text-primary-color me-2"></i>
+                                    <strong>Duration:</strong> @ongoingSession.Duration
+                                </div>
+                                <div class="info-item">
+                                    <i class="bi bi-people text-primary-color me-2"></i>
+                                    <strong>Capacity:</strong> @ongoingSession.AvailableSlots/@ongoingSession.Capacity slots
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-0">
+                            <div class="d-grid gap-2">
+                                <a asp-controller="Bookings" asp-action="OngoingSessionMembers" asp-route-Id="@ongoingSession.Id" class="btn btn-outline btn-sm">
+                                    <i class="bi bi-eye me-1"></i> View Members
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-calendar-x display-1 text-muted"></i>
+            <h4 class="mt-3 text-muted">No Sessions Available</h4>
+            <p class="text-muted">Create training session first to get started</p>
+        </div>
+    }
+</div>

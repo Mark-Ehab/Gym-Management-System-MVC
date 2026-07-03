@@ -55,7 +55,7 @@
                                 <a class="nav-link @setActive("Memberships") px-3 py-2 mx-2 fw-bolder fs-5" aria-current="@(setActive("Memberships") == "active"? "page" : null)" asp-controller="Memberships" asp-action="Index">Memberships</a>
                         </li>
                         <li class="nav-item">
-                                <a class="nav-link @setActive("Sessions Schedule") px-3 py-2 mx-2 fw-bolder fs-5" aria-current="@(setActive("Sessions Schedule") == "active"? "page" : null)" asp-controller="SessionsSchedule" asp-action="Index">Sessions Schedule</a>
+                                <a class="nav-link @setActive("Bookings") px-3 py-2 mx-2 fw-bolder fs-5" aria-current="@(setActive("Bookings") == "active"? "page" : null)" asp-controller="Bookings" asp-action="Index">Sessions Schedule</a>
                         </li>
                         <li class="nav-item">
                                 <form asp-action="Logout" asp-controller="Account" method="post" class="d-inline">
@@ -76,11 +76,6 @@
          </main> 
     </div>
 
-    @* <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - GymManagementSystem.Presentation - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer> *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

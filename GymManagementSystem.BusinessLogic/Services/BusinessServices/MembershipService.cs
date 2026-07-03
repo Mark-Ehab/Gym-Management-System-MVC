@@ -54,9 +54,9 @@ public class MembershipService : IMembershipService
     public async Task<Result<IEnumerable<MemberSelectDTO>>> GetMembersForDropDownListAsync(CancellationToken ct = default)
     {
         var memberRepo = _unitOfWork.GetGenericRepository<Member>();
-        var membersWithActiveMembershipsSpecification = new MembersWithActiveMembershipsSpecification();
+        var membersWitNoActiveMembershipsSpecification = new MembersWithNoActiveMembershipsSpecification();
 
-        var allowedMembersToSubscribe = await memberRepo.ListAsync(membersWithActiveMembershipsSpecification, ct: ct);
+        var allowedMembersToSubscribe = await memberRepo.ListAsync(membersWitNoActiveMembershipsSpecification, ct: ct);
 
         if (allowedMembersToSubscribe is null || allowedMembersToSubscribe.Count == 0)
         {

@@ -37,9 +37,6 @@ public sealed class MembersController : Controller
     {
         var allMembersDTOs = await _memberService.GetAllMembersAsync(ct);
 
-        if (!allMembersDTOs.Any())
-            return View();
-
         var allMembersViewModels = _mapper.Map<IEnumerable<AllMembersViewModel>>(allMembersDTOs);
 
         return View(allMembersViewModels);

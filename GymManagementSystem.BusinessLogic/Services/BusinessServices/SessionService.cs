@@ -53,9 +53,9 @@ public sealed class SessionService : ISessionService
         var numberOfBookingsPerSession = await sessionRepo.GetNumberOfBookingsPerSessions(allSessionIds,ct);
 
         if(numberOfBookingsPerSession is not null && numberOfBookingsPerSession.Count > 0)
-            foreach(var allSessionDTO in  allSessionDTOs)
-                allSessionDTO.NumberOfBookingsPerSession = numberOfBookingsPerSession[allSessionDTO.Id];
-
+            foreach(var session in numberOfBookingsPerSession)
+                allSessionDTOs.FirstOrDefault(s => s.Id == session.Key)!.NumberOfBookingsPerSession = session.Value;
+        
         _logger.LogInformation("Sessions: {@Sessions} are retrieved successfully", allSessionDTOs.Select(s => new
         {
             s.Id,

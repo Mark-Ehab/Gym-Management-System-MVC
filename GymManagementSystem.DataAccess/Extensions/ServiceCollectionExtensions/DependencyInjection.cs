@@ -52,6 +52,6 @@ public static class DependencyInjection
             options.Lockout.MaxFailedAccessAttempts = 3;
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
         })
-            .AddEntityFrameworkStores<GymDbContext>();   
+            .AddEntityFrameworkStores<GymDbContext>();
     }
 }

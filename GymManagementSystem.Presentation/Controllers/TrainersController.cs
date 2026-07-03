@@ -29,9 +29,6 @@ public sealed class TrainersController : Controller
     {
         var allTrainersDTOs = await _trainerService.GetAllTrainersAsync(ct);
 
-        if (allTrainersDTOs is null)
-            return View();
-
         var allTrainersViewModels = _mapper.Map<IEnumerable<AllTrainersViewModel>>(allTrainersDTOs);
 
         return View(allTrainersViewModels);

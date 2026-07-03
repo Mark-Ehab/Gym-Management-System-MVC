@@ -33,9 +33,6 @@ public class SessionsController : Controller
     {
         var allSessionDTOs = await _sessionService.GetAllSessionsAsync(ct);
 
-        if (!allSessionDTOs.Any())
-            return View();
-
         var allSessionViewModels = _mapper.Map<IEnumerable<AllSessionsViewModel>>(allSessionDTOs);
 
         return View(allSessionViewModels);
@@ -46,7 +43,7 @@ public class SessionsController : Controller
     public async Task<IActionResult> Create(CancellationToken ct)
     {
 
-        var categoriesResult = await ProvideCategoryListValues(ct);
+        var categoriesResult = await ProvideCategoryListValuesAsync(ct);
 
         if(categoriesResult.IsFailure)
         {
@@ -54,7 +51,7 @@ public class SessionsController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var trainersResult = await ProvideTrainerDropDownListValues(ct);
+        var trainersResult = await ProvideTrainerDropDownListValuesAsync(ct);
 
         if (trainersResult.IsFailure)
         {
@@ -72,7 +69,7 @@ public class SessionsController : Controller
     {
         if(!ModelState.IsValid)
         {
-            var categoriesResult = await ProvideCategoryListValues(ct);
+            var categoriesResult = await ProvideCategoryListValuesAsync(ct);
 
             if (categoriesResult.IsFailure)
             {
@@ -80,7 +77,7 @@ public class SessionsController : Controller
                 return RedirectToAction(nameof(Index));
             }
 
-            var trainersResult = await ProvideTrainerDropDownListValues(ct);
+            var trainersResult = await ProvideTrainerDropDownListValuesAsync(ct);
 
             if (trainersResult.IsFailure)
             {
@@ -102,8 +99,8 @@ public class SessionsController : Controller
         else 
         {
             TempData["FailureAlert"] = result.Error!.Description;
-            await ProvideCategoryListValues(ct);
-            await ProvideTrainerDropDownListValues(ct);
+            await ProvideCategoryListValuesAsync(ct);
+            await ProvideTrainerDropDownListValuesAsync(ct);
             return View(createSessionViewModel);
         }
 
@@ -139,7 +136,7 @@ public class SessionsController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var trainersResult = await ProvideTrainerDropDownListValues(ct);
+        var trainersResult = await ProvideTrainerDropDownListValuesAsync(ct);
 
         if (trainersResult.IsFailure)
         {
@@ -160,7 +157,7 @@ public class SessionsController : Controller
     {
         if(!ModelState.IsValid)
         {
-            var trainersResult = await ProvideTrainerDropDownListValues(ct);
+            var trainersResult = await ProvideTrainerDropDownListValuesAsync(ct);
 
             if (trainersResult.IsFailure)
             {
@@ -186,7 +183,7 @@ public class SessionsController : Controller
         else
         {
             TempData["FailureAlert"] = result.Error!.Description;
-            await  ProvideTrainerDropDownListValues(ct);
+            await  ProvideTrainerDropDownListValuesAsync(ct);
             return View(editSessionViewModel);
         }
 
@@ -229,7 +226,7 @@ public class SessionsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    private async Task<Result> ProvideCategoryListValues(CancellationToken ct = default)
+    private async Task<Result> ProvideCategoryListValuesAsync(CancellationToken ct = default)
     {
         var categoryDropDownListResult = await _sessionService.GetAllPossibleSessionCategoriesForDropDownListAsync(ct);
 
@@ -239,7 +236,7 @@ public class SessionsController : Controller
         ViewBag.Categories = new SelectList(categoryDropDownListResult.Value, nameof(CategorySelectDTO.Id), nameof(CategorySelectDTO.Name));
         return Result.Success();
     }
-    private async Task<Result> ProvideTrainerDropDownListValues(CancellationToken ct = default)
+    private async Task<Result> ProvideTrainerDropDownListValuesAsync(CancellationToken ct = default)
     {
         var trainerDropDownListResult = await _sessionService.GetAllPossibleSessionTrainersForDropDownListAsync(ct);
 

@@ -17,5 +17,6 @@ public class SessionRepository : GenericRepository<Session>, ISessionRepository
     public async Task<IDictionary<Guid, int>> GetNumberOfBookingsPerSessions(IReadOnlyList<Guid> sessionIds, CancellationToken ct)
         => await _gymDbContext.Bookings
             .Where(b => sessionIds.Contains(b.SessionId))
-            .GroupBy(b => b.SessionId).ToDictionaryAsync(g => g.Key,g => g.Count(),ct);
+            .GroupBy(b => b.SessionId)
+            .ToDictionaryAsync(g => g.Key,g => g.Count(),ct);
 }
