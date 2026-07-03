@@ -1,0 +1,81 @@
+using GymManagementSystem.BusinessLogic.Extensions.ServiceCollectionExtensions;
+using GymManagementSystem.BusinessLogic.Services;
+using GymManagementSystem.DataAccess.Data.Contexts;
+using GymManagementSystem.DataAccess.Extensions.ServiceCollectionExtensions;
+using GymManagementSystem.DataAccess.Interceptors;
+using GymManagementSystem.DataAccess.Repositories.Classes;
+using GymManagementSystem.DataAccess.Repositories.Contracts;
+using GymManagementSystem.DataAccess.Seeders;
+using GymManagementSystem.Presentation.Extensions.ServiceCollectionExtensions;
+using GymManagementSystem.Presentation.Extensions.WebApplicationExtensions;
+using GymManagementSystem.Presentation.Middlewares;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.Seq("http://localhost:5341")
+    .CreateBootstrapLogger();
+
+try 
+{
+    Log.Information("Gym Management system is starting ...");
+
+    // Create Web Application builder
+    var builder = WebApplication.CreateBuilder(args);
+
+    // Configure Serilog as default logger
+    builder.Host.UseSerilog((context, loggerConfiguration) =>
+    {
+        loggerConfiguration.ReadFrom.Configuration(context.Configuration);
+    });
+
+    // Register Presentation layer services to the DI container.
+    builder.Services.AddPresentation();
+
+    // Register Business Logic layer services to the DI container.
+    builder.Services.AddBusinessLogic();
+
+    // Register Data Access layer services to the DI container.
+    builder.Services.AddDataAccess(builder.Configuration);
+
+    var app = builder.Build();
+
+    // Migrate and seed database
+    await app.MigrateAndSeedDatabase(builder.Configuration);
+
+    //app.UseGlobalExceptionHandler();
+
+    // Configure the HTTP request pipeline.
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Home/Error");
+        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        app.UseHsts();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseRouting();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.UseSerilogRequestLogging();
+
+    app.MapStaticAssets();
+
+    app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Account}/{action=Login}/{id?}")
+        .WithStaticAssets();
+
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "The Application failed to start correctly!");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
