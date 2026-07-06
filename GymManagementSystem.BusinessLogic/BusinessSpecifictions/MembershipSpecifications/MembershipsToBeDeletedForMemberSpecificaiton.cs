@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GymManagementSystem.BusinessLogic.Services.BusinessServices;
+namespace GymManagementSystem.BusinessLogic.BusinessSpecifictions.MembershipSpecifications;
 
 public sealed class MembershipsToBeDeletedForMemberSpecificaiton : Specification<Membership>
 {
